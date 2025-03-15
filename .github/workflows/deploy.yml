@@ -21,14 +21,11 @@ jobs:
       - name: Install MkDocs and Dependencies
         run: pip install mkdocs-material mkdocs-awesome-nav mkdocs-swagger-ui-tag
 
-      - name: Configure Git
+      - name: Configure Git for Deployment
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/KUB-Education/KUB-Documentation-Space.git
 
       - name: Deploy MkDocs
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: |
-          git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/KUB-Education/KUB-Documentation-Space.git
-          mkdocs gh-deploy --force --remote-branch gh-pages
+        run: mkdocs gh-deploy --force
