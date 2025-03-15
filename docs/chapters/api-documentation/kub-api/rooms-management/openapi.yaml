@@ -1,0 +1,231 @@
+openapi: 3.1.0
+info:
+  title: KUB Rooms API
+  description: Room API for managing rooms of KUB Education platform
+  version: 1.0-dev
+servers:
+  - url: https://stage.api.kub.education
+    description: Stage API Server
+
+security:
+  - Authorization:
+      - admin
+
+paths:
+  /rooms:
+    post:
+      operationId: createRoom
+      summary: Create a new room 
+      description: Creates a new room with the provided details. Requires 'admin' role.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoomRequest"
+            examples:
+              default:
+                value:
+                  location: "306, 2 floor"
+                  capacity: 20
+      responses:
+        "201":
+          $ref: "#/components/responses/Created"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+    get:
+      operationId: getRoomsByFilters
+      summary: Get rooms
+      description: Retrieves a list of all rooms (or by location fragment and min capacity).
+      parameters:
+      - name: locationContains
+        in: query
+        required: false
+        schema:
+          type: string
+          description: The fragment of the location to filter rooms by.
+          minLength: 1
+          maxLength: 256
+      - name: minCapacity
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int16
+          description: The minimum capacity to filter rooms by.
+          minimum: 1
+          maximum: 32767
+      responses:
+        "200":
+          description: Successful retrieval of rooms.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RoomResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /rooms/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      operationId: getRoomById
+      summary: Get room
+      description: Retrieves details of a specific room.
+      responses:
+        "200":
+          description: Successful retrieval of the room.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      operationId: updateRoom
+      summary: Edit room
+      description: Updates details of a specific room. Requires 'admin' role.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoomUpdateRequest"
+            examples:
+              default:
+                value:
+                  location: "306, 2 floor"
+                  capacity: 20
+      responses:
+        "200":
+          description: Successful update of the room.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+    delete:
+      operationId: deleteRoom
+      summary: Delete room
+      description: Deletes a room. Requires 'admin' role.
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  responses:
+    Created:
+      description: Resource created successfully
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/RoomResponse"
+    BadRequest:
+      description: Bad request (Wrong request parameters)
+    Unauthorized:
+      description: Unauthorized (Wrong token in Authorization header)
+    Forbidden:
+      description: Forbidden (Insufficient permissions, admin role required)
+    NotFound:
+      description: Not Found (Resource not found)
+    NoContent:
+      description: No content (Successfully deleted)
+    Conflict:
+      description: Conflict (Resource already exists)
+    UnprocessableEntity:
+      description: Unprocessable Entity (Validation error)
+
+  securitySchemes:
+    Authorization:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "JWT token with required 'admin' role."
+  schemas:
+    RoomRequest:
+      type: object
+      required:
+        - location
+        - capacity
+      properties:
+        location:
+          type: string
+          minLength: 1
+          maxLength: 256
+          examples: ["306, 2 floor"]
+        capacity:
+          type: integer
+          format: int16
+          examples: [20]
+
+    RoomUpdateRequest:
+      type: object
+      properties:
+        location:
+          type: string
+          minLength: 1
+          maxLength: 256
+          examples: ["306, 2 floor"]
+        capacity:
+          type: integer
+          format: int16
+          examples: [20]
+
+    RoomResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          examples: [1]
+        location:
+          type: string
+          minLength: 1
+          maxLength: 256
+          examples: ["306, 2 floor"]
+        capacity:
+          type: integer
+          format: int16
+          examples: [20]
