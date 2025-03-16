@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: KUB [Super Admin] Admins API
-  description: Super Admin API for managing admins of KUB Education platform
+  description: Super Admin API for managing admins on KUB Education platform
   version: 1.0-dev
 servers:
   - url: https://stage.superadmin.api.kub.education
