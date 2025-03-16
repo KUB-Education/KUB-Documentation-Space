@@ -1,9 +1,9 @@
-name: Deploy MkDocs
+name: Deploy MkDocs Manually
 
 on:
   push:
     branches:
-      - master  # or main, depending on your default branch
+      - master  # Or main if that's your default branch
 
 jobs:
   deploy:
@@ -21,13 +21,19 @@ jobs:
       - name: Install MkDocs and Dependencies
         run: pip install mkdocs-material mkdocs-awesome-nav mkdocs-swagger-ui-tag
 
-      - name: Configure Git Authentication
+      - name: Build MkDocs Site
+        run: mkdocs build
+
+      - name: Deploy to gh-pages Branch
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/KUB-Education/KUB-Documentation-Space.git
-
-      - name: Deploy MkDocs
-        run: mkdocs gh-deploy --force
+          cd site
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote add origin https://x-access-token:${GH_TOKEN}@github.com/KUB-Education/KUB-Documentation-Space.git
+          git checkout -b gh-pages
+          git add .
+          git commit -m "Deploy MkDocs site"
+          git push --force origin gh-pages
