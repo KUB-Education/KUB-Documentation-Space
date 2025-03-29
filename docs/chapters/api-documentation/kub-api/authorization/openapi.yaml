@@ -1,0 +1,165 @@
+openapi: 3.1.0
+info:
+  title: KUB Auth API
+  description: Auth API for authorization on KUB Education platform
+  version: 1.0-dev
+servers:
+  - url: https://stage.auth.api.kub.education
+    description: Stage Server
+
+paths:
+  /auth/login:
+    post:
+      operationId: login
+      summary: Login
+      description: >
+        Authorizes a user with email and password.
+        Required authority role: none.
+      security: []  # No authorization needed for login.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+            examples:
+              default:
+                value:
+                  email: "user@example.com"
+                  password: "ExamplePass123!"
+      responses:
+        "200":
+          description: Successful authorization.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+              examples:
+                default:
+                  value:
+                    access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    refresh_token: "dGhpc2lzbXlyZWZyZXNodG9rZW4..."
+                    first_login: true
+        "400":
+          description: Bad Request.
+        "401":
+          description: Unauthorized.
+        "422":
+          description: Unprocessable Entity (Validation error).
+
+  /auth/logout:
+    post:
+      operationId: logout
+      summary: Logout
+      description: > 
+        Logs out an authorized user.
+        Required authority role: anyOf(admin, lecturer, student).
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      responses:
+        "204":
+          description: Successful logout.
+        "400":
+          description: Bad Request.
+        "401":
+          description: Unauthorized.
+
+  /auth/refresh:
+    post:
+      operationId: refreshToken
+      summary: Refresh Token
+      description: >
+        Refreshes the authorization tokens.
+        Required authority role: none.
+      security: []  # No authorization required.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefreshRequest"
+            examples:
+              default:
+                value:
+                  refresh_token: "dGhpc2lzbXlyZWZyZXNodG9rZW4..."
+      responses:
+        "200":
+          description: Tokens refreshed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RefreshResponse"
+              examples:
+                default:
+                  value:
+                    access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    refresh_token: "newRefreshTokenHere..."
+        "400":
+          description: Bad Request.
+        "401":
+          description: Unauthorized.
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          maxLength: 64
+          pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+          description: Must be a valid email address.
+          example: "user@mail.com"
+        password:
+          type: string
+          minLength: 8
+          maxLength: 72
+          pattern: "^(?=.{8,72}$)(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[~`!@#$%^&*()_+\\-={}\\[\\]|\\\\:;\"'<>.?/]).+$"
+          description: Must be between 8 and 72 characters long, contain at least one uppercase letter, one lowercase letter, one digit, and one special character.
+          example: "Password123!"
+    LoginResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: JWT access token.
+        refresh_token:
+          type: string
+          description: JWT refresh token.
+        first_login:
+          type: boolean
+          description: Indicates if this is the user's first login.
+    RefreshRequest:
+      type: object
+      required:
+        - refresh_token
+      properties:
+        refresh_token:
+          type: string
+          description: JWT refresh token.
+    RefreshResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: New JWT access token.
+        refresh_token:
+          type: string
+          description: New JWT refresh token.
