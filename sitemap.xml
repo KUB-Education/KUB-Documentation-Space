@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://KUB-Education.github.io/KUB-Documentation-Space/</loc>
+         <lastmod>2025-03-29</lastmod>
+    </url>
+    <url>
+         <loc>https://KUB-Education.github.io/KUB-Documentation-Space/chapters/api-documentation/kub-api/authorization/api/</loc>
+         <lastmod>2025-03-29</lastmod>
+    </url>
+    <url>
+         <loc>https://KUB-Education.github.io/KUB-Documentation-Space/chapters/api-documentation/kub-api/rooms-management/api/</loc>
+         <lastmod>2025-03-29</lastmod>
+    </url>
+    <url>
+         <loc>https://KUB-Education.github.io/KUB-Documentation-Space/chapters/api-documentation/kub-api/specialties-management/api/</loc>
+         <lastmod>2025-03-29</lastmod>
+    </url>
+    <url>
+         <loc>https://KUB-Education.github.io/KUB-Documentation-Space/chapters/api-documentation/kub-api/user-management/api/</loc>
+         <lastmod>2025-03-29</lastmod>
+    </url>
+    <url>
+         <loc>https://KUB-Education.github.io/KUB-Documentation-Space/chapters/api-documentation/kub-super-admin-api/admins-management/api/</loc>
+         <lastmod>2025-03-29</lastmod>
+    </url>
+</urlset>
