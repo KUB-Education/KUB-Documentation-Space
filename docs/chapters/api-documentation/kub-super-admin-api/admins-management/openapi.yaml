@@ -189,28 +189,28 @@ components:
           maxLength: 32
           pattern: "^(?=.{1,32}$)[A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+(?:[-'ʼ][A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+)*$"
           description: "Must contain only English or Ukrainian letters, dash, and apostrophe; max 32 characters. Russian-specific letters (Ы, Э) are not allowed."
-          examples: ["Doe"]
+          example: "Doe"
         first_name:
           type: string
           minLength: 1
           maxLength: 32
           pattern: "^(?=.{1,32}$)[A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+(?:[-'ʼ][A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+)*$"
           description: "Must contain only English or Ukrainian letters, dash, and apostrophe; max 32 characters. Russian-specific letters (Ы, Э) are not allowed."
-          examples: ["John"]
+          example: "John"
         middle_name:
           type: string
-          minLength: 1
+          minLength: 0
           maxLength: 32
-          pattern: "^(?=.{1,32}$)[A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+(?:[-'ʼ][A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+)*$"
+          pattern: "^$|^(?=.{1,32}$)[A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+(?:[-'ʼ][A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+)*$"
           description: "Optional. If provided, must contain only English or Ukrainian letters, dash, and apostrophe; max 32 characters. Russian-specific letters (Ы, Э) are not allowed."
-          examples: ["Edward"]
+          example: "Edward"
         email:
           type: string
           format: email
           maxLength: 64
           pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
           description: "Must be a valid email address."
-          examples: ["john.doe@example.com"]
+          example: "john.doe@example.com"
 
     AdminUpdateRequest:
       type: object
@@ -221,28 +221,28 @@ components:
           maxLength: 32
           pattern: "^(?=.{1,32}$)[A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+(?:[-'ʼ][A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+)*$"
           description: "Must contain only English or Ukrainian letters, dash, and apostrophe; max 32 characters. Russian-specific letters (Ы, Э) are not allowed."
-          examples: ["Smith"]
+          example: "Smith"
         first_name:
           type: string
           minLength: 1
           maxLength: 32
           pattern: "^(?=.{1,32}$)[A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+(?:[-'ʼ][A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+)*$"
           description: "Must contain only English or Ukrainian letters, dash, and apostrophe; max 32 characters. Russian-specific letters (Ы, Э) are not allowed."
-          examples: ["Alice"]
+          example: "Alice"
         middle_name:
           type: string
           minLength: 0
           maxLength: 32
-          pattern: "^(?=.{0,32}$)[A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+(?:[-'ʼ][A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+)*$"
+          pattern: "^$|^(?=.{0,32}$)[A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+(?:[-'ʼ][A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+)*$"
           description: "Optional. If provided, must contain only English or Ukrainian letters, dash, and apostrophe; max 32 characters. Russian-specific letters (Ы, Э) are not allowed."
-          examples: [""]
+          example: ""
         email:
           type: string
           format: email
           maxLength: 64
           pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
           description: "Must be a valid email address."
-          examples: ["alice.smith@example.com"]
+          example: "alice.smith@example.com"
 
     AdminResponse:
       type: object
@@ -250,24 +250,24 @@ components:
         id:
           type: integer
           format: int64
-          examples: [1]
+          example: 1
         user_id:
           type: integer
           format: int64
-          examples: [1001]
+          example: 1001
         last_name:
           type: string
-          examples: ["Doe"]
+          example: "Doe"
         first_name:
           type: string
-          examples: ["John"]
+          example: "John"
         middle_name:
           type: string
-          examples: ["Edward"]
+          example: "Edward"
         email:
           type: string
           format: email
-          examples: ["john.doe@example.com"]
+          example: "john.doe@example.com"
         status:
           type: string
-          examples: ["ACTIVATION_PENDING"]
+          example: "ACTIVATION_PENDING"
