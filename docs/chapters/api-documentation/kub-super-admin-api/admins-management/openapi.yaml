@@ -266,6 +266,6 @@ components:
           type: string
           format: email
           example: "john.doe@example.com"
-        status:
+        user_status:
           type: string
           example: "ACTIVATION_PENDING"
