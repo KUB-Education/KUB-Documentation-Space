@@ -2,4 +2,5 @@ nav:
   - Authorization: ./authorization
   - User Management: ./user-management
   - Rooms Management: ./rooms-management
+  - Lecturers Management: ./lecturers-management
   - Specialties Management: ./specialties-management

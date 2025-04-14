@@ -18,6 +18,14 @@ paths:
       security:
         - Authorization:
             - admin
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
       requestBody:
         required: true
         content:
@@ -54,6 +62,13 @@ paths:
         - Authorization:
             - admin
       parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+          example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        description: Bearer token.
       - name: nameContains
         in: query
         required: false
@@ -108,6 +123,14 @@ paths:
             - admin
             - lecturer
             - student
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
       responses:
         "200":
           description: Successful retrieval of the specialty.
@@ -131,6 +154,14 @@ paths:
       security:
         - Authorization:
             - admin
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
       requestBody:
         required: true
         content:
@@ -162,6 +193,14 @@ paths:
       security:
         - Authorization:
             - admin
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
       responses:
         "204":
           $ref: "#/components/responses/NoContent"

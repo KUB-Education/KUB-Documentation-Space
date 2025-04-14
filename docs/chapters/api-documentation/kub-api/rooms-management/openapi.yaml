@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: KUB Rooms API
-  description: Room API for managing rooms on KUB Education platform
+  description: Rooms API for managing rooms on KUB Education platform
   version: 1.0-dev
 servers:
   - url: https://stage.api.kub.education
@@ -17,6 +17,14 @@ paths:
         Required authority role: admin.
       security:
         - BearerAuth: [ ]
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
       requestBody:
         required: true
         content:
@@ -51,23 +59,30 @@ paths:
       security:
         - BearerAuth: [ ]
       parameters:
-      - name: locationContains
-        in: query
-        required: false
-        schema:
-          type: string
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+        - name: locationContains
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 256
           description: The fragment of the location to filter rooms by.
-          minLength: 1
-          maxLength: 256
-      - name: minCapacity
-        in: query
-        required: false
-        schema:
-          type: integer
-          format: int16
+        - name: minCapacity
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int16
+            minimum: 1
+            maximum: 32767
           description: The minimum capacity to filter rooms by.
-          minimum: 1
-          maximum: 32767
       responses:
         "200":
           description: Successful retrieval of rooms.
@@ -94,7 +109,6 @@ paths:
         schema:
           type: integer
           format: int64
-
     get:
       operationId: getRoomById
       summary: Get room
@@ -103,6 +117,14 @@ paths:
         Required authority role: anyOf(admin, lecturer, student).
       security:
         - BearerAuth: [ ]
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
       responses:
         "200":
           description: Successful retrieval of the room.
@@ -125,6 +147,14 @@ paths:
         Required authority role: admin.
       security:
         - BearerAuth: [ ]
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
       requestBody:
         required: true
         content:
@@ -162,6 +192,14 @@ paths:
         Required authority role: admin.
       security:
         - BearerAuth: [ ]
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
       responses:
         "204":
           $ref: "#/components/responses/NoContent"
@@ -173,6 +211,51 @@ paths:
           $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
+
+  /rooms/{id}/resend:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      operationId: resendRoomPassword
+      summary: Resend room password
+      description: >
+        Resends password for the room (if applicable).
+        Required authority role: admin.
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      responses:
+        "200":
+          description: Successful password resend.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomResponse"
+              examples:
+                default:
+                  value:
+                    id: 1
+                    location: "306a"
+                    capacity: 20
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
 
 components:
   responses:
@@ -196,9 +279,11 @@ components:
       description: Conflict (Resource already exists)
     UnprocessableEntity:
       description: Unprocessable Entity (Validation error)
+    ServiceUnavailable:
+      description: Service Unavailable (e.g. SMTP failure)
 
   securitySchemes:
-    Authorization:
+    BearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
