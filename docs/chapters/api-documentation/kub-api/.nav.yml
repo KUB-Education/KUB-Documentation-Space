@@ -7,5 +7,6 @@ nav:
 
   - Study Fields Management: ./study-fields-management
   - Specialties Management: ./specialties-management
+  - Educational Programs Management: ./educational-programs-management
 
   - Rooms Management: ./rooms-management
