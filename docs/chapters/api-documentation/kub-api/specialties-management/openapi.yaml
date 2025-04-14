@@ -31,13 +31,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SpecialtyRequest"
+              $ref: "#/components/schemas/specialty_request"
             examples:
               default:
                 value:
                   code: "CS101"
-                  name: "Computer Science"
-                  fieldOfStudyId: 1
+                  name: "computer_science"
+                  study_field_id: 1
       responses:
         "201":
           $ref: "#/components/responses/Created"
@@ -45,8 +45,6 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
         "409":
           $ref: "#/components/responses/Conflict"
         "422":
@@ -62,29 +60,29 @@ paths:
         - Authorization:
             - admin
       parameters:
-      - name: Authorization
-        in: header
-        required: true
-        schema:
-          type: string
-          example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-        description: Bearer token.
-      - name: nameContains
-        in: query
-        required: false
-        schema:
-          type: string
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 128
           description: The fragment of the name to filter specialties by.
-          minLength: 1
-          maxLength: 128
-      - name: codeContains
-        in: query
-        required: false
-        schema:
-          type: string
+        - name: code
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 32
           description: The fragment of the code to filter specialties by.
-          minLength: 1
-          maxLength: 32
       responses:
         "200":
           description: Successful retrieval of specialties.
@@ -93,13 +91,11 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/SpecialtyResponse"
+                  $ref: "#/components/schemas/specialty_response"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
         "422":
           $ref: "#/components/responses/UnprocessableEntity"
 
@@ -137,7 +133,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SpecialtyResponse"
+                $ref: "#/components/schemas/specialty_response"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -167,22 +163,28 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SpecialtyUpdateRequest"
+              $ref: "#/components/schemas/specialty_update_request"
+            examples:
+              default:
+                value:
+                  code: "CS101"
+                  name: "computer_science"
+                  study_field_id: 2
       responses:
         "200":
           description: Successful update of the specialty.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SpecialtyResponse"
+                $ref: "#/components/schemas/specialty_response"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
 
     delete:
       operationId: deleteSpecialty
@@ -208,8 +210,6 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
 
@@ -220,7 +220,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/SpecialtyResponse"
+            $ref: "#/components/schemas/specialty_response"
     BadRequest:
       description: Bad request (Wrong request parameters)
     Unauthorized:
@@ -236,13 +236,20 @@ components:
     UnprocessableEntity:
       description: Unprocessable Entity (Validation error)
 
+  securitySchemes:
+    Authorization:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "JWT token with required role (admin, lecturer, student)."
+
   schemas:
-    SpecialtyRequest:
+    specialty_request:
       type: object
       required:
         - code
         - name
-        - fieldOfStudyId
+        - study_field_id
       properties:
         code:
           type: string
@@ -252,11 +259,11 @@ components:
           type: string
           minLength: 1
           maxLength: 128
-        fieldOfStudyId:
+        study_field_id:
           type: integer
           format: int64
     
-    SpecialtyUpdateRequest:
+    specialty_update_request:
       type: object
       properties:
         code:
@@ -267,11 +274,11 @@ components:
           type: string
           minLength: 1
           maxLength: 128
-        fieldOfStudyId:
+        study_field_id:
           type: integer
           format: int64
 
-    SpecialtyResponse:
+    specialty_response:
       type: object
       properties:
         id:
@@ -281,5 +288,5 @@ components:
           type: string
         name:
           type: string
-        fieldOfStudyName:
+        study_field_name:
           type: string

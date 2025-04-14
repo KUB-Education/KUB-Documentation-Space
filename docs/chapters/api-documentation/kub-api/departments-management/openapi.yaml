@@ -67,14 +67,14 @@ paths:
             type: string
             example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
           description: Bearer token.
-        - name: nameContains
+        - name: name
           in: query
           required: false
           schema:
             type: string
-            description: The fragment of the department name to filter by.
             minLength: 1
             maxLength: 256
+          description: The fragment of the department name to filter by.
       responses:
         "200":
           description: Successful retrieval of departments.
@@ -241,6 +241,8 @@ components:
           type: string
           minLength: 1
           maxLength: 256
+          description: >
+            The department name. This field cannot be blank.
           example: "Computer Science Department"
     
     DepartmentUpdateRequest:
@@ -250,6 +252,8 @@ components:
           type: string
           minLength: 1
           maxLength: 256
+          description: >
+            The updated department name. This field cannot be blank.
           example: "Computer Science and Engineering Department"
 
     DepartmentResponse:

@@ -43,8 +43,6 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
         "409":
           $ref: "#/components/responses/Conflict"
         "422":
@@ -66,7 +64,7 @@ paths:
             type: string
             example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
           description: Bearer token.
-        - name: locationContains
+        - name: location
           in: query
           required: false
           schema:
@@ -96,8 +94,6 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
         "422":
           $ref: "#/components/responses/UnprocessableEntity"
 
@@ -177,8 +173,6 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
         "422":
@@ -207,55 +201,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
         "404":
           $ref: "#/components/responses/NotFound"
-
-  /rooms/{id}/resend:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-    post:
-      operationId: resendRoomPassword
-      summary: Resend room password
-      description: >
-        Resends password for the room (if applicable).
-        Required authority role: admin.
-      security:
-        - BearerAuth: [ ]
-      parameters:
-        - name: Authorization
-          in: header
-          required: true
-          schema:
-            type: string
-            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-          description: Bearer token.
-      responses:
-        "200":
-          description: Successful password resend.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RoomResponse"
-              examples:
-                default:
-                  value:
-                    id: 1
-                    location: "306a"
-                    capacity: 20
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-        "404":
-          $ref: "#/components/responses/NotFound"
-        "503":
-          $ref: "#/components/responses/ServiceUnavailable"
 
 components:
   responses:

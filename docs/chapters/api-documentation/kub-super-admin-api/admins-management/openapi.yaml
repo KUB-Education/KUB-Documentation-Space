@@ -161,8 +161,6 @@ paths:
           description: Bad request (Wrong request parameters)
         "401":
           description: Unauthorized (Wrong header)
-        "422":
-          description: Unprocessable Entity (Validation error)
         "404":
           description: Not Found (Admin not found)
         "503":
