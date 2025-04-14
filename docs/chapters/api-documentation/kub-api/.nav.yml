@@ -9,4 +9,6 @@ nav:
   - Specialties Management: ./specialties-management
   - Educational Programs Management: ./educational-programs-management
 
+  - Students Management: ./students-management
+
   - Rooms Management: ./rooms-management
