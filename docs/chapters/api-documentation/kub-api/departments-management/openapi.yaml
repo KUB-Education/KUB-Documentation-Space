@@ -1,0 +1,264 @@
+openapi: 3.1.0
+info:
+  title: KUB Departments API
+  description: Departments API for managing departments on KUB Education platform
+  version: 1.0-dev
+servers:
+  - url: https://stage.api.kub.education
+    description: Stage API Server
+
+paths:
+  /departments:
+    post:
+      operationId: createDepartment
+      summary: Create a new department
+      description: > 
+        Creates a new department with the provided details. 
+        Required authority role: admin.
+      security:
+        - Authorization:
+            - admin
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DepartmentRequest"
+            examples:
+              default:
+                value:
+                  name: "Computer Science Department"
+      responses:
+        "201":
+          $ref: "#/components/responses/Created"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+    get:
+      operationId: getDepartments
+      summary: Get departments
+      description: > 
+        Retrieves a list of all departments (or by name filter).
+        Required authority role: anyOf(admin, lecturer, student).
+      security:
+        - Authorization:
+            - admin
+            - lecturer
+            - student
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+        - name: nameContains
+          in: query
+          required: false
+          schema:
+            type: string
+            description: The fragment of the department name to filter by.
+            minLength: 1
+            maxLength: 256
+      responses:
+        "200":
+          description: Successful retrieval of departments.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DepartmentResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /departments/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+
+    get:
+      operationId: getDepartmentById
+      summary: Get department
+      description: > 
+        Retrieves details of a specific department.
+        Required authority role: anyOf(admin, lecturer, student).
+      security:
+        - Authorization:
+            - admin
+            - lecturer
+            - student
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      responses:
+        "200":
+          description: Successful retrieval of the department.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DepartmentResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    put:
+      operationId: updateDepartment
+      summary: Edit department
+      description: > 
+        Updates details of a specific department. 
+        Required authority role: admin.
+      security:
+        - Authorization:
+            - admin
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DepartmentUpdateRequest"
+            examples:
+              default:
+                value:
+                  name: "Computer Science and Engineering Department"
+      responses:
+        "200":
+          description: Successful update of the department.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DepartmentResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+    delete:
+      operationId: deleteDepartment
+      summary: Delete department
+      description: > 
+        Deletes a department. 
+        Required authority role: admin.
+      security:
+        - Authorization:
+            - admin
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  responses:
+    Created:
+      description: Resource created successfully
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DepartmentResponse"
+    BadRequest:
+      description: Bad request (Wrong request parameters)
+    Unauthorized:
+      description: Unauthorized (Wrong token in Authorization header)
+    NotFound:
+      description: Not Found (Resource not found)
+    NoContent:
+      description: No content (Successfully deleted)
+    Conflict:
+      description: Conflict (Resource already exists)
+    UnprocessableEntity:
+      description: Unprocessable Entity (Validation error)
+
+  securitySchemes:
+    Authorization:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "JWT token with required role (admin, lecturer, student)."
+
+  schemas:
+    DepartmentRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 256
+          example: "Computer Science Department"
+    
+    DepartmentUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 256
+          example: "Computer Science and Engineering Department"
+
+    DepartmentResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: "Computer Science Department"
