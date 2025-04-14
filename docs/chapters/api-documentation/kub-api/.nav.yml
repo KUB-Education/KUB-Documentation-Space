@@ -5,6 +5,7 @@ nav:
   - Departments Management: ./departments-management
   - Lecturers Management: ./lecturers-management
 
+  - Study Fields Management: ./study-fields-management
   - Specialties Management: ./specialties-management
 
   - Rooms Management: ./rooms-management
