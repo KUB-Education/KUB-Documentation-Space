@@ -3,7 +3,7 @@ name: Deploy MkDocs Manually
 on:
   push:
     branches:
-      - master  # Or main if that's your default branch
+      - master # Or main if that's your default branch
 
 jobs:
   deploy:
@@ -19,7 +19,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install MkDocs and Dependencies
-        run: pip install mkdocs-material mkdocs-awesome-nav mkdocs-swagger-ui-tag
+        run: pip install -r requirements.txt
 
       - name: Build MkDocs Site
         run: mkdocs build

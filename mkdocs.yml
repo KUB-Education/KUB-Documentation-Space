@@ -5,25 +5,33 @@ site_url: "https://KUB-Education.github.io/KUB-Documentation-Space/"
 
 theme:
   name: material
-  logo: 'assets/images/kub-text-logo.svg'
-  favicon: 'assets/images/kub-logo.svg'
+  logo: "assets/images/kub-text-logo.svg"
+  favicon: "assets/images/kub-logo.svg"
   palette:
     - scheme: default
       primary: custom
+      accent: custom
       toggle:
         icon: material/brightness-7
-        name: "Switch to light mode"
+        name: "Switch to dark mode"
 
     - scheme: slate
       primary: custom
+      accent: custom
       toggle:
         icon: material/brightness-4
         name: "Switch to light mode"
   font:
-    text: 'e-Ukraine, sans-serif'
-    code: 'GeistMono, monospace'
+    text: "e-Ukraine, sans-serif"
+    code: "GeistMono, monospace"
   features:
-    - content.full_width
+    - navigation.tabs
+    - navigation.sections
+    - navigation.instant
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - content.code.copy
 
 plugins:
   - search
@@ -32,4 +40,4 @@ plugins:
       supportedSubmitMethods: []
 
 extra_css:
-  - 'assets/css/custom.css'
+  - "assets/css/custom.css"

@@ -2,20 +2,20 @@ openapi: 3.1.0
 info:
   title: KUB Auth API
   description: Auth API for authorization on KUB Education platform
-  version: 1.0-dev
+  version: 1.0.0-dev
 servers:
-  - url: https://stage.auth.api.kub.education
+  - url: https://stage.api.kub.education
     description: Stage Server
 
 paths:
-  /auth/login:
+  /api/v1/auth/login:
     post:
       operationId: login
       summary: Login
       description: >
         Authorizes a user with email and password.
         Required authority role: none.
-      security: []  # No authorization needed for login.
+      security: [] # No authorization needed for login.
       requestBody:
         required: true
         content:
@@ -47,11 +47,11 @@ paths:
         "422":
           description: Unprocessable Entity (Validation error).
 
-  /auth/logout:
+  /api/v1/auth/logout:
     post:
       operationId: logout
       summary: Logout
-      description: > 
+      description: >
         Logs out an authorized user.
         Required authority role: anyOf(admin, lecturer, student).
       security:
@@ -72,14 +72,14 @@ paths:
         "401":
           description: Unauthorized.
 
-  /auth/refresh:
+  /api/v1/auth/refresh:
     post:
       operationId: refreshToken
       summary: Refresh Token
       description: >
         Refreshes the authorization tokens.
         Required authority role: none.
-      security: []  # No authorization required.
+      security: [] # No authorization required.
       requestBody:
         required: true
         content:

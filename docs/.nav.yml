@@ -1,6 +1,3 @@
 nav:
   - Introduction: index.md
-  - API:
-    - KUB Super Admin API: chapters/api-documentation/kub-super-admin-api
-    - KUB API: chapters/api-documentation/kub-api
-
+  - API: chapters/kub-ce-api
