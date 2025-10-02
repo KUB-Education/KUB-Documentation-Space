@@ -1,0 +1,169 @@
+openapi: 3.1.0
+info:
+  title: KUB User API
+  description: User API for managing user information and password operations on KUB Education platform
+  version: 1.0-dev
+servers:
+  - url: https://stage.user.api.kub.education
+    description: Stage Server
+
+paths:
+  /user/me:
+    get:
+      operationId: getCurrentUser
+      summary: Get Current User
+      description: >
+        Retrieves details of the currently authenticated user.
+        Required authority role: anyOf(admin, lecturer, student).
+      security:
+        - BearerAuth: ["admin", "lecturer", "student"]
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      responses:
+        "200":
+          description: Successful retrieval of user details.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+              examples:
+                default:
+                  value:
+                    last_name: "Doe"
+                    first_name: "John"
+                    middle_name: "Edward"
+                    email: "john.doe@example.com"
+        "401":
+          description: Unauthorized.
+
+  /user/change-password:
+    post:
+      operationId: changePassword
+      summary: Change Password
+      description: >
+        Changes the password for the authenticated user.
+        Required authority role: anyOf(admin, lecturer, student).
+      security:
+        - BearerAuth: ["admin", "lecturer", "student"]
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordRequest"
+            examples:
+              default:
+                value:
+                  old_password: "OldPass123!"
+                  new_password: "NewPass456#"
+      responses:
+        "204":
+          description: Password changed successfully.
+        "400":
+          description: Bad Request.
+        "401":
+          description: Unauthorized.
+        "422":
+          description: Unprocessable Entity (Validation error).
+
+  /user/recovery-password:
+    post:
+      operationId: recoveryPassword
+      summary: Recovery Password
+      description: >
+        Initiates a password recovery process for a user.
+        Required authority role: none.
+      security: []  # No authentication required.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RecoveryPasswordRequest"
+            examples:
+              default:
+                value:
+                  email: "user@example.com"
+      responses:
+        "204":
+          description: Password recovery initiated successfully.
+        "400":
+          description: Bad Request.
+        "422":
+          description: Unprocessable Entity (Validation error).
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    UserResponse:
+      type: object
+      properties:
+        last_name:
+          type: string
+          description: The user's last name.
+          example: "Doe"
+        first_name:
+          type: string
+          description: The user's first name.
+          example: "John"
+        middle_name:
+          type: string
+          description: The user's middle name.
+          example: "Edward"
+        email:
+          type: string
+          format: email
+          description: The user's email address.
+          example: "john.doe@example.com"
+    ChangePasswordRequest:
+      type: object
+      required:
+        - old_password
+        - new_password
+      properties:
+        old_password:
+          type: string
+          minLength: 8
+          maxLength: 72
+          pattern: "^(?=.{8,72}$)(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[~`!@#$%^&*()_+\\-={}\\[\\]|\\\\:;\"'<>.?/]).+$"
+          description: >
+            The current password. Must be between 8 and 72 characters long, contain at least one uppercase letter, one lowercase letter, one digit, and one special character.
+          example: "OldPass123!"
+        new_password:
+          type: string
+          minLength: 8
+          maxLength: 72
+          pattern: "^(?=.{8,72}$)(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[~`!@#$%^&*()_+\\-={}\\[\\]|\\\\:;\"'<>.?/]).+$"
+          description: >
+            The new password. Must be between 8 and 72 characters long, contain at least one uppercase letter, one lowercase letter, one digit, and one special character.
+          example: "NewPass456#"
+    RecoveryPasswordRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          maxLength: 64
+          pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+          description: Must be a valid email address.
+          example: "user@example.com"
