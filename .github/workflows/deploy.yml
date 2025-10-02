@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - master
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+      - "requirements.txt"
+  workflow_dispatch: {}
 permissions:
   contents: write
 
@@ -24,7 +29,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
       - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
       - uses: actions/cache@v4
         with:
