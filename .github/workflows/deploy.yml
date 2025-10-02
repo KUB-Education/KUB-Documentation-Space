@@ -42,17 +42,3 @@ jobs:
 
       - name: Build and Deploy MkDocs Site
         run: mkdocs gh-deploy --force
-
-      # - name: Deploy to gh-pages Branch
-      #   env:
-      #     GH_TOKEN: ${{ secrets.GH_TOKEN }}
-      #   run: |
-      #     cd site
-      #     git init
-      #     git config user.name "github-actions[bot]"
-      #     git config user.email "github-actions[bot]@users.noreply.github.com"
-      #     git remote add origin https://x-access-token:${GH_TOKEN}@github.com/KUB-Education/KUB-Documentation-Space.git
-      #     git checkout -b gh-pages
-      #     git add .
-      #     git commit -m "Deploy MkDocs site"
-      #     git push --force origin gh-pages
