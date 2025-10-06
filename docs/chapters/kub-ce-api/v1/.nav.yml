@@ -2,3 +2,4 @@ nav:
   - Bootstrap API: ./bootstrap/api.md
   - Auth API: ./auth/api.md
   - Account API: ./account/api.md
+  - Users API: ./users/api.md

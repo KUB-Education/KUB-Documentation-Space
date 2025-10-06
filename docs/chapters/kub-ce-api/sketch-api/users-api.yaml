@@ -1,0 +1,252 @@
+openapi: 3.1.0
+info:
+  title: Users API
+  version: 1.0.0
+  description: API for users management for KUB Education.
+servers:
+  - url: https://api.kub.education/api/v1/
+
+post /users:
+  Description: Creates user record with default role USER
+  Authorization:
+    - Definition: Bearer token
+    - Description: Requires any of roles ORGANIZER, SYSADMIN, ADMIN
+
+  Request:
+    body:
+      $objects@UserCreateRequest:
+
+  Response:
+    - variant:
+      Description: User created succcessfully
+      code: 201
+      body:
+        $objects@UserDetailsResponse:
+
+    - variant:
+      Description: Bad request
+      code: 400
+
+    - variant:
+      Description: Token invalid or roles are missing
+      code: 401
+
+    - variant:
+      Description: User with such email exists
+      code: 409
+
+    - variant:
+      Decription: Request body fails validation
+      code: 422
+
+    - variant:
+      Description: User created, but email wasn't sent
+      code: 503
+
+get /users:
+  Description: Returns array of users
+  Authorization:
+    - Definition: Bearer token
+    - Description: Requires any of roles ORGANIZER, SYSADMIN, ADMIN
+
+  Response:
+    - variant:
+      Description: Users returned succcessfully
+      code: 200
+      body:
+        array:
+          $objects@UserDetailsResponse:
+
+    - variant:
+      Description: Bad request
+      code: 400
+
+    - variant:
+      Description: Token invalid or roles are missing
+      code: 401
+
+get /users/{id}:
+  Description: Returns user by id
+  Authorization:
+    - Definition: Bearer token
+    - Description: Requires any of roles USER
+
+  Response:
+    - variant:
+      Description: User returned succcessfully
+      code: 200
+      body:
+        $objects@UserDetailsResponse:
+
+    - variant:
+      Description: Bad request
+      code: 400
+
+    - variant:
+      Description: Token invalid or roles are missing
+      code: 401
+
+    - veriant:
+      Description: User not found
+      code: 404
+
+put /users/{id}:
+  Description: Update user by id
+  Authorization:
+    - Definition: Bearer token
+    - Description: Requires any of roles ORGANIZER, SYSADMIN, ADMIN
+
+  Request:
+    body:
+      $objects@UserUpdateRequest:
+
+  Response:
+    - variant:
+      Description: User returned succcessfully
+      code: 200
+      body:
+        $objects@UserDetailsResponse:
+
+    - variant:
+      Description: Bad request
+      code: 400
+
+    - variant:
+      Description: Token invalid or roles are missing
+      code: 401
+
+    - veriant:
+      Description: User not found
+      code: 404
+
+    - variant:
+      Description: User with such email exists
+      code: 409
+
+    - variant:
+      Decription: Request body fails validation
+      code: 422
+
+    - variant:
+      Description: User updated, but email wasn't sent
+      code: 503
+
+delete /users/{id}:
+  Description: Delete user by id
+  Authorization:
+    - Definition: Bearer token
+    - Description: Requires any of roles ORGANIZER, SYSADMIN, ADMIN
+
+  Response:
+    - variant:
+      Description: User deleted successful
+      code: 204
+
+    - variant:
+      Description: Bad request
+      code: 400
+
+    - variant:
+      Description: Token invalid or roles are missing
+      code: 401
+
+    - veriant:
+      Description: User not found
+      code: 404
+
+post /users/{id}/add-role:
+  Description: Add user role
+  Authorization:
+    - Definition: Bearer token
+    - Description: Requires any of roles ORGANIZER, SYSADMIN, ADMIN
+
+  Request:
+    body:
+      $objects@RoleType:
+
+  Response:
+    - variant:
+      Description: User updated succcessfully
+      code: 200
+      body:
+        $objects@UserDetailsResponse:
+
+    - variant:
+      Description: Bad request
+      code: 400
+
+    - variant:
+      Description: Token invalid or roles are missing
+      code: 401
+
+    - veriant:
+      Description: User not found
+      code: 404
+
+    - variant:
+      Decription: Request body fails validation
+      code: 422
+
+post /users/{id}/remove-role:
+  Description: Remove user role
+  Authorization:
+    - Definition: Bearer token
+    - Description: Requires any of roles ORGANIZER, SYSADMIN, ADMIN
+
+  Request:
+    body:
+      $objects@RoleType:
+
+  Response:
+    - variant:
+      Description: User updated succcessfully
+      code: 200
+      body:
+        $objects@UserDetailsResponse:
+
+    - variant:
+      Description: Bad request
+      code: 400
+
+    - variant:
+      Description: Token invalid or roles are missing
+      code: 401
+
+    - veriant:
+      Description: User not found
+      code: 404
+
+    - variant:
+      Decription: Request body fails validation
+      code: 422
+
+$objects:
+  UserCreateRequest:
+    last_name: string
+    first_name: string
+    middle_name: string
+    email: string
+
+  UserUpdateRequest:
+    last_name: string
+    first_name: string
+    middle_name: string
+    email: string
+
+  UserDetailsResponse:
+    id: integer
+    last_name: string
+    first_name: string
+    middle_name: string
+    email: string
+    status: string enum(EMAIL_SENDING_FAILURE, ACTIVATION_PENDING, ACTIVATION_EXPIRED, ACTIVATED, RECOVERY_PENDING)
+    roles:
+      array:
+        $objects@Role:
+
+  Role:
+    id: integer
+    type: string enum(USER, STUDENT, LECTURER, ADMIN, SYSADMIN, ORGANIZER)
+
+  RoleType:
+    type: string enum(USER, STUDENT, LECTURER, ADMIN, SYSADMIN, ORGANIZER)
