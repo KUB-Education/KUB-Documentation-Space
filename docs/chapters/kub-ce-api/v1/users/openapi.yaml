@@ -6,6 +6,9 @@ info:
 servers:
   - url: https://api.kub.education/api/v1/
 
+security:
+  - bearerAuth: []
+
 tags:
   - name: Users
     description: User management operations
@@ -17,16 +20,32 @@ components:
       scheme: bearer
       bearerFormat: JWT
 
+  parameters:
+    AuthorizationHeaderUser:
+      name: Authorization
+      in: header
+      required: true
+      description: "Bearer token. Required role: USER"
+      schema:
+        type: string
+    AuthorizationHeaderAdminSet:
+      name: Authorization
+      in: header
+      required: true
+      description: "Bearer token. Required roles: ORGANIZER, SYSADMIN, ADMIN"
+      schema:
+        type: string
+
   schemas:
     RoleType:
       type: object
       additionalProperties: false
+      description: 'Wrapper for a role assignment, e.g. { "type": "ADMIN" }'
       properties:
         type:
           type: string
           enum: [USER, STUDENT, LECTURER, ADMIN, SYSADMIN, ORGANIZER]
       required: [type]
-      description: Wrapper for a role assignment
 
     Role:
       type: object
@@ -116,9 +135,9 @@ paths:
       operationId: createUser
       summary: Create user (default role USER)
       description: Creates user record with default role USER.
-      security:
-        - bearerAuth: []
       x-roles: [ORGANIZER, SYSADMIN, ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdminSet"
       requestBody:
         required: true
         content:
@@ -139,24 +158,19 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserDetailsResponse"
-        "400":
-          description: Bad request
-        "401":
-          description: Token invalid or roles are missing
-        "409":
-          description: User with such email exists
-        "422":
-          description: Request body fails validation
-        "503":
-          description: User created, but email wasn't sent
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "409": { description: User with such email exists }
+        "422": { description: Request body fails validation }
+        "503": { description: User created, but email wasn't sent }
     get:
       tags: [Users]
       operationId: listUsers
       summary: List users
       description: Returns array of users.
-      security:
-        - bearerAuth: []
       x-roles: [ORGANIZER, SYSADMIN, ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdminSet"
       responses:
         "200":
           description: Users returned successfully
@@ -166,10 +180,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/UserDetailsResponse"
-        "400":
-          description: Bad request
-        "401":
-          description: Token invalid or roles are missing
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
 
   /users/{id}:
     parameters:
@@ -185,9 +197,9 @@ paths:
       operationId: getUserById
       summary: Get user by ID
       description: Returns user by id.
-      security:
-        - bearerAuth: []
       x-roles: [USER]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderUser"
       responses:
         "200":
           description: User returned successfully
@@ -195,20 +207,17 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserDetailsResponse"
-        "400":
-          description: Bad request
-        "401":
-          description: Token invalid or roles are missing
-        "404":
-          description: User not found
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: User not found }
     put:
       tags: [Users]
       operationId: updateUserById
       summary: Update user by ID
       description: Update user by id.
-      security:
-        - bearerAuth: []
       x-roles: [ORGANIZER, SYSADMIN, ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdminSet"
       requestBody:
         required: true
         content:
@@ -229,35 +238,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserDetailsResponse"
-        "400":
-          description: Bad request
-        "401":
-          description: Token invalid or roles are missing
-        "404":
-          description: User not found
-        "409":
-          description: User with such email exists
-        "422":
-          description: Request body fails validation
-        "503":
-          description: User updated, but email wasn't sent
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: User not found }
+        "409": { description: User with such email exists }
+        "422": { description: Request body fails validation }
+        "503": { description: User updated, but email wasn't sent }
     delete:
       tags: [Users]
       operationId: deleteUserById
       summary: Delete user by ID
       description: Delete user by id.
-      security:
-        - bearerAuth: []
       x-roles: [ORGANIZER, SYSADMIN, ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdminSet"
       responses:
-        "204":
-          description: User deleted successfully
-        "400":
-          description: Bad request
-        "401":
-          description: Token invalid or roles are missing
-        "404":
-          description: User not found
+        "204": { description: User deleted successfully }
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: User not found }
 
   /users/{id}/add-role:
     parameters:
@@ -273,9 +272,9 @@ paths:
       operationId: addRoleToUser
       summary: Add user role
       description: Add user role.
-      security:
-        - bearerAuth: []
       x-roles: [ORGANIZER, SYSADMIN, ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdminSet"
       requestBody:
         required: true
         content:
@@ -293,14 +292,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserDetailsResponse"
-        "400":
-          description: Bad request
-        "401":
-          description: Token invalid or roles are missing
-        "404":
-          description: User not found
-        "422":
-          description: Request body fails validation
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: User not found }
+        "422": { description: Request body fails validation }
 
   /users/{id}/remove-role:
     parameters:
@@ -316,9 +311,9 @@ paths:
       operationId: removeRoleFromUser
       summary: Remove user role
       description: Remove user role.
-      security:
-        - bearerAuth: []
       x-roles: [ORGANIZER, SYSADMIN, ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdminSet"
       requestBody:
         required: true
         content:
@@ -336,11 +331,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserDetailsResponse"
-        "400":
-          description: Bad request
-        "401":
-          description: Token invalid or roles are missing
-        "404":
-          description: User not found
-        "422":
-          description: Request body fails validation
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: User not found }
+        "422": { description: Request body fails validation }
