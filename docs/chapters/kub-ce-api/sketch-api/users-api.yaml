@@ -6,6 +6,37 @@ info:
 servers:
   - url: https://api.kub.education/api/v1/
 
+$objects:
+  UserCreateRequest:
+    last_name: string
+    first_name: string
+    middle_name: string
+    email: string
+
+  UserUpdateRequest:
+    last_name: string
+    first_name: string
+    middle_name: string
+    email: string
+
+  UserDetailsResponse:
+    id: integer
+    last_name: string
+    first_name: string
+    middle_name: string
+    email: string
+    status: string enum(EMAIL_SENDING_FAILURE, ACTIVATION_PENDING, ACTIVATION_EXPIRED, ACTIVATED, RECOVERY_PENDING)
+    roles:
+      array:
+        $objects@Role:
+
+  Role:
+    id: integer
+    type: string enum(USER, STUDENT, LECTURER, ADMIN, SYSADMIN, ORGANIZER)
+
+  RoleType:
+    type: string enum(USER, STUDENT, LECTURER, ADMIN, SYSADMIN, ORGANIZER)
+
 post /users:
   Description: Creates user record with default role USER
   Authorization:
@@ -44,7 +75,7 @@ post /users:
       code: 503
 
 get /users:
-  Description: Returns array of users
+  Description: Return an users list
   Authorization:
     - Definition: Bearer token
     - Description: Requires any of roles ORGANIZER, SYSADMIN, ADMIN
@@ -219,34 +250,3 @@ post /users/{id}/remove-role:
     - variant:
       Decription: Request body fails validation
       code: 422
-
-$objects:
-  UserCreateRequest:
-    last_name: string
-    first_name: string
-    middle_name: string
-    email: string
-
-  UserUpdateRequest:
-    last_name: string
-    first_name: string
-    middle_name: string
-    email: string
-
-  UserDetailsResponse:
-    id: integer
-    last_name: string
-    first_name: string
-    middle_name: string
-    email: string
-    status: string enum(EMAIL_SENDING_FAILURE, ACTIVATION_PENDING, ACTIVATION_EXPIRED, ACTIVATED, RECOVERY_PENDING)
-    roles:
-      array:
-        $objects@Role:
-
-  Role:
-    id: integer
-    type: string enum(USER, STUDENT, LECTURER, ADMIN, SYSADMIN, ORGANIZER)
-
-  RoleType:
-    type: string enum(USER, STUDENT, LECTURER, ADMIN, SYSADMIN, ORGANIZER)

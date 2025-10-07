@@ -3,3 +3,4 @@ nav:
   - Auth API: ./auth/api.md
   - Account API: ./account/api.md
   - Users API: ./users/api.md
+  - Rooms API: ./rooms/api.md

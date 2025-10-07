@@ -1,0 +1,201 @@
+openapi: 3.1.0
+info:
+  title: Rooms API
+  version: 1.0.0
+  description: API for rooms management for KUB Education.
+servers:
+  - url: https://api.kub.education/api/v1/
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Rooms
+    description: Rooms management operations
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    AuthorizationHeaderUser:
+      name: Authorization
+      in: header
+      required: true
+      description: "Bearer token. Required role: USER"
+      schema:
+        type: string
+    AuthorizationHeaderAdmin:
+      name: Authorization
+      in: header
+      required: true
+      description: "Bearer token. Required role: ADMIN"
+      schema:
+        type: string
+
+  schemas:
+    RoomCreateRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        location:
+          type: string
+        capacity:
+          type: integer
+        details:
+          type: string
+      required: [location, capacity]
+    RoomUpdateRequest:
+      type: object
+      additionalProperties: false
+      description: All fields are optional; include the ones to change.
+      properties:
+        location:
+          type: string
+        capacity:
+          type: integer
+        details:
+          type: string
+    RoomDetailsResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+          format: int64
+        location:
+          type: string
+        capacity:
+          type: integer
+        details:
+          type: string
+      required: [id, location, capacity]
+
+paths:
+  /rooms:
+    post:
+      tags: [Rooms]
+      operationId: createRoom
+      summary: Create a new room
+      description: Create a new room
+      x-roles: [ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoomCreateRequest"
+            examples:
+              example:
+                value:
+                  location: "Main Campus - B201"
+                  capacity: 40
+                  details: "Projector and whiteboard"
+      responses:
+        "201":
+          description: Room created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "409": { description: Room with such location exists }
+        "422": { description: Request body fails validation }
+    get:
+      tags: [Rooms]
+      operationId: listRooms
+      summary: Return a rooms list
+      description: Return a rooms list
+      x-roles: [ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+      responses:
+        "200":
+          description: Rooms returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RoomDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+
+  /rooms/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Room identifier
+        schema:
+          type: integer
+          format: int64
+    get:
+      tags: [Rooms]
+      operationId: getRoomById
+      summary: Return a room by ID
+      description: Return a room by ID
+      x-roles: [USER]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderUser"
+      responses:
+        "200":
+          description: Room returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Room not found }
+    put:
+      tags: [Rooms]
+      operationId: updateRoomById
+      summary: Update a room by ID
+      description: Update a room by ID
+      x-roles: [ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoomUpdateRequest"
+            examples:
+              allUpdatableFields:
+                value:
+                  location: "Main Campus - B201"
+                  capacity: 50
+                  details: "Upgraded projector and sound system"
+      responses:
+        "200":
+          description: Room updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Room not found }
+        "409": { description: Room with such location exists }
+        "422": { description: Request body fails validation }
+    delete:
+      tags: [Rooms]
+      operationId: deleteRoomById
+      summary: Delete a room by ID
+      description: Delete a room by ID
+      x-roles: [ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+      responses:
+        "204": { description: Room deleted successfully }
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Room not found }
