@@ -4,11 +4,13 @@ info:
   description: Account API for account control on KUB Education platform
   version: 1.0.0-dev
 servers:
-  - url: https://stage.api.kub.education
-    description: Stage Server
+  - url: https://api.kub.education/api/v1
+    description: Production API Server
+  - url: https://stage.api.kub.education/api/v1
+    description: Stage API Server
 
 paths:
-  /api/v1/account/me:
+  /account/me:
     get:
       summary: "Get user account info"
       operationId: "getCurrentUser"
@@ -29,7 +31,7 @@ paths:
             "*/*":
               schema:
                 $ref: "#/components/schemas/UserDetailsResponse"
-  /api/v1/account/change-password:
+  /account/change-password:
     post:
       summary: "Change user account password"
       operationId: "changeUserPassword"
@@ -58,7 +60,7 @@ paths:
           description: Unauthorized.
         "422":
           description: Unprocessable Entity (Validation error).
-  /api/v1/account/recovery-password:
+  /account/recovery-password:
     post:
       summary: "Recovery user account password"
       operationId: "recoveryUserPassword"

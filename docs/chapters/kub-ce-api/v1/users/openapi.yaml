@@ -4,7 +4,10 @@ info:
   version: 1.0.0
   description: API for users management for KUB Education.
 servers:
-  - url: https://api.kub.education/api/v1/
+  - url: https://api.kub.education/api/v1
+    description: Production API Server
+  - url: https://stage.api.kub.education/api/v1
+    description: Stage API Server
 
 security:
   - bearerAuth: []
@@ -28,6 +31,8 @@ components:
       description: "Bearer token. Required role: USER"
       schema:
         type: string
+        example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
     AuthorizationHeaderAdminSet:
       name: Authorization
       in: header
@@ -35,6 +40,7 @@ components:
       description: "Bearer token. Required roles: ORGANIZER, SYSADMIN, ADMIN"
       schema:
         type: string
+        example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
   schemas:
     RoleType:

@@ -4,11 +4,13 @@ info:
   description: Bootstrap API for bootstrapping on KUB Education platform
   version: 1.0.0-dev
 servers:
-  - url: https://stage.api.kub.education
-    description: Stage Server
+  - url: https://api.kub.education/api/v1
+    description: Production API Server
+  - url: https://stage.api.kub.education/api/v1
+    description: Stage API Server
 
 paths:
-  /api/v1/bootstrap/organizer-user:
+  /bootstrap/organizer-user:
     post:
       summary: "Bootstrap organizer user"
       operationId: "createOrganizerUser"

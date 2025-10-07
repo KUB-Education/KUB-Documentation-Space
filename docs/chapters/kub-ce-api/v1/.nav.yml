@@ -4,3 +4,4 @@ nav:
   - Account API: ./account/api.md
   - Users API: ./users/api.md
   - Rooms API: ./rooms/api.md
+  - Departments API: ./departments/api.md
