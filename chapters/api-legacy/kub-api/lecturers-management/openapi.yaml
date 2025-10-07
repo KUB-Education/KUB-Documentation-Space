@@ -1,0 +1,494 @@
+openapi: 3.1.0
+info:
+  title: KUB Lecturers API
+  description: Lecturers API for lecturers management on KUB Education Platform
+  version: 1.0-dev
+servers:
+  - url: https://stage.api.kub.education
+    description: Stage Server
+
+paths:
+  /lecturers:
+    post:
+      operationId: createLecturer
+      summary: Create lecturer
+      description: >
+        Creates a new lecturer.
+        Required authority role: admin.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LecturerCreateRequest"
+            examples:
+              default:
+                value:
+                  last_name: "Doe"
+                  first_name: "John"
+                  middle_name: ""
+                  email: "john.doe@example.com"
+                  department_id: 101
+                  academic_title: "DOCTOR_OF_PHILOSOPHY"
+                  position: "ASSISTANT"
+                  status: "ACTIVE"
+      responses:
+        "201":
+          description: Lecturer created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LecturerResponse"
+              examples:
+                default:
+                  value:
+                    id: 1
+                    last_name: "Doe"
+                    first_name: "John"
+                    middle_name: ""
+                    email: "john.doe@example.com"
+                    user_status: "ACTIVATED"
+                    department_name: "Computer Science"
+                    academic_title: "DOCTOR_OF_PHILOSOPHY"
+                    position: "ASSISTANT"
+                    status: "ACTIVE"
+        "400":
+          description: Bad Request.
+        "401":
+          description: Unauthorized.
+        "409":
+          description: Conflict.
+        "422":
+          description: Unprocessable Entity (Validation error).
+
+    get:
+      operationId: getLecturers
+      summary: Retrieve a list of lecturers
+      description: >
+        Retrieves a list of lecturers.
+        Required authority role: anyOf(admin, lecturer, student).
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      responses:
+        "200":
+          description: Successful retrieval of lecturers.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LecturerResponse"
+              examples:
+                default:
+                  value:
+                    - id: 1
+                      last_name: "Doe"
+                      first_name: "John"
+                      middle_name: "Edward"
+                      email: "john.doe@example.com"
+                      user_status: "ACTIVATED"
+                      department_name: "Computer Science"
+                      academic_title: "DOCTOR_OF_PHILOSOPHY"
+                      position: "ASSISTANT"
+                      status: "ACTIVE"
+                    - id: 2
+                      last_name: "Smith"
+                      first_name: "Alice"
+                      middle_name: ""
+                      email: "alice.smith@example.com"
+                      user_status: "ACTIVATED"
+                      department_name: "Mathematics"
+                      academic_title: "NONE"
+                      position: "PROFESSOR"
+                      status: "ACTIVE"
+        "401":
+          description: Unauthorized.
+
+  /lecturers/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      operationId: getLecturerById
+      summary: Retrieve a specific lecturer
+      description: >
+        Retrieves details of a specific lecturer.
+        Required authority role: anyOf(admin, lecturer, student).
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      responses:
+        "200":
+          description: Successful retrieval of the lecturer.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LecturerResponse"
+              examples:
+                default:
+                  value:
+                    id: 1
+                    last_name: "Doe"
+                    first_name: "John"
+                    middle_name: "Edward"
+                    email: "john.doe@example.com"
+                    user_status: "ACTIVATED"
+                    department_name: "Computer Science"
+                    academic_title: "DOCTOR_OF_PHILOSOPHY"
+                    position: "ASSISTANT"
+                    status: "ACTIVE"
+        "400":
+          description: Bad Request.
+        "401":
+          description: Unauthorized.
+        "404":
+          description: Not Found.
+        "422":
+          description: Unprocessable Entity (Validation error).
+    put:
+      operationId: updateLecturer
+      summary: Update a specific lecturer
+      description: >
+        Updates details of a specific lecturer.
+        Required authority role: admin.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LecturerUpdateRequest"
+            examples:
+              default:
+                value:
+                  last_name: "Smith"
+                  first_name: "Alice"
+                  middle_name: ""
+                  email: "alice.smith@example.com"
+                  department_id: 202
+                  academic_title: "DOCTOR_OF_SCIENCE"
+                  position: "PROFESSOR"
+                  status: "ACTIVE"
+      responses:
+        "200":
+          description: Successful update of the lecturer.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LecturerResponse"
+              examples:
+                default:
+                  value:
+                    id: 1
+                    last_name: "Smith"
+                    first_name: "Alice"
+                    middle_name: ""
+                    email: "alice.smith@example.com"
+                    user_status: "ACTIVATED"
+                    department_name: "Mathematics"
+                    academic_title: "DOCTOR_OF_SCIENCE"
+                    position: "PROFESSOR"
+                    status: "ACTIVE"
+        "400":
+          description: Bad Request.
+        "401":
+          description: Unauthorized.
+        "404":
+          description: Not Found.
+        "422":
+          description: Unprocessable Entity (Validation error).
+    delete:
+      operationId: deleteLecturer
+      summary: Delete a specific lecturer
+      description: >
+        Deletes a specific lecturer.
+        Required authority role: admin.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      responses:
+        "204":
+          description: Successfully deleted.
+        "400":
+          description: Bad Request.
+        "401":
+          description: Unauthorized.
+        "404":
+          description: Not Found.
+
+  /lecturers/{id}/resend:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      operationId: resendLecturerPassword
+      summary: Resend password for a specific lecturer
+      description: >
+        Resends password for the specified lecturer.
+        Required authority role: admin.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      responses:
+        "200":
+          description: Successful password resend.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LecturerResponse"
+              examples:
+                default:
+                  value:
+                    id: 1
+                    last_name: "Doe"
+                    first_name: "John"
+                    middle_name: "Edward"
+                    email: "john.doe@example.com"
+                    user_status: "ACTIVATED"
+                    department_name: "Computer Science"
+                    academic_title: "DOCTOR_OF_PHILOSOPHY"
+                    position: "ASSISTANT"
+                    status: "ACTIVE"
+        "400":
+          description: Bad Request.
+        "401":
+          description: Unauthorized.
+        "404":
+          description: Not Found.
+        "503":
+          description: Service Unavailable (SMTP failure).
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    LecturerCreateRequest:
+      type: object
+      required:
+        - last_name
+        - first_name
+        - email
+        - department_id
+      properties:
+        last_name:
+          type: string
+          minLength: 1
+          maxLength: 32
+          pattern: "^(?=.{1,32}$)[A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+(?:[-'ʼ][A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+)*$"
+          description: >
+            Must contain only English or Ukrainian letters, dash, and apostrophe; max 32 characters.
+            Russian-specific letters (Ы, Э) are not allowed.
+          example: "Doe"
+        first_name:
+          type: string
+          minLength: 1
+          maxLength: 32
+          pattern: "^(?=.{1,32}$)[A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+(?:[-'ʼ][A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+)*$"
+          description: >
+            Must contain only English or Ukrainian letters, dash, and apostrophe; max 32 characters.
+            Russian-specific letters (Ы, Э) are not allowed.
+          example: "John"
+        middle_name:
+          type: string
+          minLength: 0
+          maxLength: 32
+          pattern: "^$|^(?=.{1,32}$)[A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+(?:[-'ʼ][A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+)*$"
+          description: >
+            Optional. If provided, must contain only English or Ukrainian letters, dash, and apostrophe; max 32 characters.
+            Russian-specific letters (Ы, Э) are not allowed.
+          example: "Edward"
+        email:
+          type: string
+          format: email
+          maxLength: 64
+          pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+          description: Must be a valid email address.
+          example: "john.doe@example.com"
+        department_id:
+          type: integer
+          description: Department identifier.
+          example: 101
+        academic_title:
+          type: string
+          enum:
+            - NONE
+            - DOCTOR_OF_PHILOSOPHY
+            - DOCTOR_OF_SCIENCE
+          description: Academic title.
+          example: "DOCTOR_OF_PHILOSOPHY"
+        position:
+          type: string
+          enum:
+            - ASSISTANT
+            - ASSOCIATE_PROFESSOR
+            - PROFESSOR
+          description: Academic position.
+          example: "ASSISTANT"
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - INACTIVE
+            - TERMINATED
+          description: Lecturer's status.
+          example: "ACTIVE"
+
+    LecturerUpdateRequest:
+      type: object
+      properties:
+        last_name:
+          type: string
+          minLength: 1
+          maxLength: 32
+          pattern: "^(?=.{1,32}$)[A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+(?:[-'ʼ][A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+)*$"
+          description: >
+            Must contain only English or Ukrainian letters, dash, and apostrophe; max 32 characters.
+            Russian-specific letters (Ы, Э) are not allowed.
+          example: "Smith"
+        first_name:
+          type: string
+          minLength: 1
+          maxLength: 32
+          pattern: "^(?=.{1,32}$)[A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+(?:[-'ʼ][A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+)*$"
+          description: >
+            Must contain only English or Ukrainian letters, dash, and apostrophe; max 32 characters.
+            Russian-specific letters (Ы, Э) are not allowed.
+          example: "Alice"
+        middle_name:
+          type: string
+          minLength: 0
+          maxLength: 32
+          pattern: "^$|^(?=.{1,32}$)[A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+(?:[-'ʼ][A-Za-zАБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя]+)*$"
+          description: >
+            Optional. If provided, must contain only English or Ukrainian letters, dash, and apostrophe; max 32 characters.
+            Russian-specific letters (Ы, Э) are not allowed.
+          example: ""
+        email:
+          type: string
+          format: email
+          maxLength: 64
+          pattern: "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+          description: Must be a valid email address.
+          example: "alice.smith@example.com"
+        department_id:
+          type: integer
+          description: Department identifier.
+          example: 202
+        academic_title:
+          type: string
+          enum:
+            - NONE
+            - DOCTOR_OF_PHILOSOPHY
+            - DOCTOR_OF_SCIENCE
+          description: Academic title.
+          example: "DOCTOR_OF_SCIENCE"
+        position:
+          type: string
+          enum:
+            - ASSISTANT
+            - ASSOCIATE_PROFESSOR
+            - PROFESSOR
+          description: Academic position.
+          example: "PROFESSOR"
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - INACTIVE
+            - TERMINATED
+          description: Lecturer's status.
+          example: "ACTIVE"
+
+    LecturerResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        last_name:
+          type: string
+          example: "Doe"
+        first_name:
+          type: string
+          example: "John"
+        middle_name:
+          type: string
+          example: "Edward"
+        email:
+          type: string
+          format: email
+          example: "john.doe@example.com"
+        user_status:
+          type: string
+          example: "ACTIVE"
+        department_name:
+          type: string
+          example: "Computer Science"
+        academic_title:
+          type: string
+          example: "DOCTOR_OF_PHILOSOPHY"
+        position:
+          type: string
+          example: "ASSISTANT"
+        status:
+          type: string
+          example: "ACTIVE"
