@@ -5,3 +5,4 @@ nav:
   - Users API: ./users/api.md
   - Rooms API: ./rooms/api.md
   - Departments API: ./departments/api.md
+  - Lecturers API: ./lecturers/api.md

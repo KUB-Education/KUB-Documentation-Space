@@ -168,7 +168,7 @@ paths:
         "401": { description: Token invalid or roles are missing }
         "409": { description: User with such email exists }
         "422": { description: Request body fails validation }
-        "503": { description: User created, but email wasn't sent }
+        
     get:
       tags: [Users]
       operationId: listUsers

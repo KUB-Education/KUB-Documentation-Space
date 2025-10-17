@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: KUB Auth API
   description: Auth API for authorization on KUB Education platform
-  version: 1.0.0-dev
+  version: 1.0.0
 servers:
   - url: https://api.kub.education/api/v1
     description: Production API Server
