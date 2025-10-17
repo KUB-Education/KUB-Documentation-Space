@@ -385,7 +385,7 @@ paths:
         "401": { description: Token invalid or roles are missing }
         "404": { description: Lecturer department position not found }
 
-/lecturers/{lecturer-id}/academic-titles/{academic-title-id}:
+  /lecturers/{lecturer-id}/academic-titles/{academic-title-id}:
     parameters:
       - name: lecturer-id
         in: path
