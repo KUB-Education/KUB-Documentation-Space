@@ -1,0 +1,164 @@
+openapi: 3.1.0
+info:
+  title: Rooms API
+  version: 1.0.0
+  description: API for rooms management for KUB Education.
+servers:
+  - url: https://api.kub.education/api/v1/
+
+$objects:
+  RoomCreateRequest:
+    location: string
+    capacity: integer
+    details: string
+
+  RoomUpdateRequest:
+    location: string
+    capacity: integer
+    details: string
+
+  RoomDetailsResponse:
+    id: integer
+    location: string
+    capacity: integer
+    details: string
+
+post /rooms:
+  Description: Create a new room
+  Authorization:
+    - Definition: Bearer token
+    - Description: Requires any of roles ADMIN
+
+  Request:
+    body:
+      $objects@RoomCreateRequest:
+
+  Response:
+    - variant:
+      Description: Room created succcessfully
+      code: 201
+      body:
+        $objects@RoomDetailsResponse:
+
+    - variant:
+      Description: Bad request
+      code: 400
+
+    - variant:
+      Description: Token invalid or roles are missing
+      code: 401
+
+    - variant:
+      Description: Room with such location exists
+      code: 409
+
+    - variant:
+      Decription: Request body fails validation
+      code: 422
+
+get /rooms:
+  Description: Return a rooms list
+  Authorization:
+    - Definition: Bearer token
+    - Description: Requires any of roles ADMIN
+
+  Response:
+    - variant:
+      Description: Users returned succcessfully
+      code: 200
+      body:
+        array:
+          $objects@RoomDetailsResponse:
+
+    - variant:
+      Description: Bad request
+      code: 400
+
+    - variant:
+      Description: Token invalid or roles are missing
+      code: 401
+
+get /rooms/{id}:
+  Description: Return a room by ID
+  Authorization:
+    - Definition: Bearer token
+    - Description: Requires any of roles USER
+
+  Response:
+    - variant:
+      Description: Room returned succcessfully
+      code: 200
+      body:
+        $objects@RoomDetailsResponse:
+
+    - variant:
+      Description: Bad request
+      code: 400
+
+    - variant:
+      Description: Token invalid or roles are missing
+      code: 401
+
+    - veriant:
+      Description: Room not found
+      code: 404
+
+put /rooms/{id}:
+  Description: Update a room by ID
+  Authorization:
+    - Definition: Bearer token
+    - Description: Requires any of roles ADMIN
+
+  Request:
+    body:
+      $objects@RoomUpdateRequest:
+
+  Response:
+    - variant:
+      Description: Room updated succcessfully
+      code: 200
+      body:
+        $objects@RoomDetailsResponse:
+
+    - variant:
+      Description: Bad request
+      code: 400
+
+    - variant:
+      Description: Token invalid or roles are missing
+      code: 401
+
+    - veriant:
+      Description: Room not found
+      code: 404
+
+    - variant:
+      Description: Room with such location exists
+      code: 409
+
+    - variant:
+      Decription: Request body fails validation
+      code: 422
+
+delete /rooms/{id}:
+  Description: Delete a room by ID
+  Authorization:
+    - Definition: Bearer token
+    - Description: Requires any of roles ADMIN
+
+  Response:
+    - variant:
+      Description: Room deleted successful
+      code: 204
+
+    - variant:
+      Description: Bad request
+      code: 400
+
+    - variant:
+      Description: Token invalid or roles are missing
+      code: 401
+
+    - veriant:
+      Description: Room not found
+      code: 404

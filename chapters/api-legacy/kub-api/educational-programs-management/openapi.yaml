@@ -1,0 +1,288 @@
+openapi: 3.1.0
+info:
+  title: Educational Programs API
+  description: Educational Programs API for educational program management on KUB Education Platform
+  version: v.1.0-dev
+servers:
+  - url: https://stage.api.kub.education
+    description: Stage API Server
+
+paths:
+  /eduprograms:
+    post:
+      operationId: createEduProgram
+      summary: Create educational program
+      description: >
+        Creates a new educational program with the provided details.
+        Required authority role: admin.
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/edu_program_request"
+            examples:
+              default:
+                value:
+                  specialty_id: 1
+                  name: "bachelor_of_science_in_computer_science"
+                  degree_type: "BACHELOR"
+                  study_form: "FULL_TIME"
+      responses:
+        "201":
+          description: Resource created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/edu_program_response"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+    get:
+      operationId: getEduPrograms
+      summary: Retrieve a list of educational programs
+      description: >
+        Retrieves a list of all educational programs.
+        Required authority role: anyOf(admin, lecturer, student).
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      responses:
+        "200":
+          description: Successful retrieval of educational programs.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/edu_program_response"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /eduprograms/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+
+    get:
+      operationId: getEduProgramById
+      summary: Retrieve a specific educational program
+      description: >
+        Retrieves details of a specific educational program.
+        Required authority role: anyOf(admin, lecturer, student).
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      responses:
+        "200":
+          description: Successful retrieval of the educational program.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/edu_program_response"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+    put:
+      operationId: updateEduProgram
+      summary: Update a specific educational program
+      description: >
+        Updates details of a specific educational program.
+        Required authority role: admin.
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/edu_program_update_request"
+            examples:
+              default:
+                value:
+                  specialty_id: 1
+                  name: "bachelor_of_science_in_computer_science"
+                  degree_type: "BACHELOR"
+                  study_form: "FULL_TIME"
+      responses:
+        "200":
+          description: Successful update of the educational program.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/edu_program_response"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+    delete:
+      operationId: deleteEduProgram
+      summary: Delete a specific educational program
+      description: >
+        Deletes a specific educational program.
+        Required authority role: admin.
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  responses:
+    Created:
+      description: Resource created successfully.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/edu_program_response"
+    BadRequest:
+      description: Bad request (Wrong request parameters)
+    Unauthorized:
+      description: Unauthorized (Wrong token in Authorization header)
+    NotFound:
+      description: Not Found (Resource not found)
+    NoContent:
+      description: No content (Successfully deleted)
+    Conflict:
+      description: Conflict (Resource already exists)
+    UnprocessableEntity:
+      description: Unprocessable Entity (Validation error)
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "JWT token with required role (admin, lecturer, student)."
+
+  schemas:
+    edu_program_request:
+      type: object
+      required:
+        - specialty_id
+        - name
+        - degree_type
+        - study_form
+      properties:
+        specialty_id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          minLength: 1
+          maxLength: 128
+        degree_type:
+          type: string
+          enum:
+            - BACHELOR
+            - MASTER
+            - POSTGRADUATE
+        study_form:
+          type: string
+          enum:
+            - FULL_TIME
+            - PART_TIME
+
+    edu_program_update_request:
+      type: object
+      properties:
+        specialty_id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          minLength: 1
+          maxLength: 128
+        degree_type:
+          type: string
+          enum:
+            - BACHELOR
+            - MASTER
+            - POSTGRADUATE
+        study_form:
+          type: string
+          enum:
+            - FULL_TIME
+            - PART_TIME
+
+    edu_program_response:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        specialty_name:
+          type: string
+        name:
+          type: string
+        degree_type:
+          type: string
+        study_form:
+          type: string
