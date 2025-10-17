@@ -52,10 +52,12 @@ components:
         user: 
           $ref: "#/components/schemas/UserDetailsResponse"
         department_positions:
-          array:
+          type: array
+          items:
             $ref: "#/components/schemas/DepartmentPositionDto"
         academic_titles:
-          array:
+          type: array
+          items:
             $ref: "#/components/schemas/AcademicTitleDto"
       
     UserDetailsResponse:
