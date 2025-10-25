@@ -168,7 +168,7 @@ paths:
         "401": { description: Token invalid or roles are missing }
         "409": { description: User with such email exists }
         "422": { description: Request body fails validation }
-        
+
     get:
       tags: [Users]
       operationId: listUsers
@@ -264,16 +264,44 @@ paths:
         "401": { description: Token invalid or roles are missing }
         "404": { description: User not found }
 
-  /users/{id}/add-role:
+  /roles:
+    get:
+      tags: [Users]
+      operationId: listRoles
+      summary: List roles
+      description: Returns array of roles.
+      x-roles: [ORGANIZER, SYSADMIN, ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdminSet"
+      responses:
+        "200":
+          description: Roles returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Role"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+
+  /users/{user-id}/roles/{role-id}:
     parameters:
-      - name: id
+      - name: user-id
         in: path
         required: true
         description: User identifier
         schema:
           type: integer
           format: int64
-    post:
+      - name: role-id
+        in: path
+        required: true
+        description: Role identifier
+        schema:
+          type: integer
+          format: int64
+    put:
       tags: [Users]
       operationId: addRoleToUser
       summary: Add user role
@@ -281,16 +309,6 @@ paths:
       x-roles: [ORGANIZER, SYSADMIN, ADMIN]
       parameters:
         - $ref: "#/components/parameters/AuthorizationHeaderAdminSet"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/RoleType"
-            examples:
-              example:
-                value:
-                  type: "ADMIN"
       responses:
         "200":
           description: User updated successfully
@@ -300,19 +318,10 @@ paths:
                 $ref: "#/components/schemas/UserDetailsResponse"
         "400": { description: Bad request }
         "401": { description: Token invalid or roles are missing }
-        "404": { description: User not found }
-        "422": { description: Request body fails validation }
+        "404": { description: User or role not found }
+        "409": { description: Role already exists }
 
-  /users/{id}/remove-role:
-    parameters:
-      - name: id
-        in: path
-        required: true
-        description: User identifier
-        schema:
-          type: integer
-          format: int64
-    post:
+    delete:
       tags: [Users]
       operationId: removeRoleFromUser
       summary: Remove user role
@@ -320,16 +329,6 @@ paths:
       x-roles: [ORGANIZER, SYSADMIN, ADMIN]
       parameters:
         - $ref: "#/components/parameters/AuthorizationHeaderAdminSet"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/RoleType"
-            examples:
-              example:
-                value:
-                  type: "STUDENT"
       responses:
         "200":
           description: User updated successfully
@@ -339,5 +338,4 @@ paths:
                 $ref: "#/components/schemas/UserDetailsResponse"
         "400": { description: Bad request }
         "401": { description: Token invalid or roles are missing }
-        "404": { description: User not found }
-        "422": { description: Request body fails validation }
+        "404": { description: User or role not found }
