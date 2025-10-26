@@ -1,0 +1,268 @@
+openapi: 3.1.0
+info:
+  title: Specialties API
+  version: 1.0.0
+  description: API for specialties management for KUB Education.
+servers:
+  - url: https://api.kub.education/api/v1
+    description: Production API Server
+  - url: https://stage.api.kub.education/api/v1
+    description: Stage API Server
+
+tags:
+  - name: Specialties
+
+components:
+  parameters:
+    AuthorizationHeaderUser:
+      name: Authorization
+      in: header
+      required: true
+      description: "Bearer token. Required role: USER"
+      schema:
+        type: string
+        example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+    AuthorizationHeaderAdmin:
+      name: Authorization
+      in: header
+      required: true
+      description: "Bearer token. Required role: ADMIN"
+      schema:
+        type: string
+        example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+  schemas:
+    SpecialtyDetailsResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 21
+        study_field_id:
+          type: integer
+          format: int64
+          example: 42
+        code:
+          type: string
+          example: 121
+        name:
+          type: string
+          example: System Software
+
+    SpecialtyUpdateRequest:
+      type: object
+      properties:
+        study_field_id:
+          type: integer
+          format: int64
+          example: 42
+        code:
+          type: string
+          example: 121
+        name:
+          type: string
+          example: System Software
+
+    SpecialtyEducationalProgramCreateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Systems Software 2016
+        degree_type:
+          type: string
+          enum: [BACHELOR, MASTER, POSTGRADUATE]
+          example: MASTER
+        study_form:
+          type: string
+          enum: [FULL_TIME, PART_TIME, ONLINE]
+          example: FULL_TIME
+        duration:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 32767
+          example: 21
+      required: [name, degree_type, study_form, duration]
+
+    EducationalProgramDetailsResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 7
+        specialty_id:
+          type: integer
+          format: int64
+          example: 21
+        name:
+          type: string
+          example: Systems Software 2016
+        degree_type:
+          type: string
+          enum: [BACHELOR, MASTER, POSTGRADUATE]
+          example: MASTER
+        study_form:
+          type: string
+          enum: [FULL_TIME, PART_TIME, ONLINE]
+          example: FULL_TIME
+        duration:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 32767
+          example: 21
+
+paths:
+  /specialties:
+    get:
+      tags: [Specialties]
+      operationId: listSpecialties
+      summary: List specialties
+      description: Returns array of specialties.
+      x-roles: [USER]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderUser"
+      responses:
+        "200":
+          description: Specialties returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SpecialtyDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+
+  /specialties/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Specialty identifier
+        schema:
+          type: integer
+          format: int64
+
+    get:
+      tags: [Specialties]
+      operationId: getSpecialty
+      summary: Get specialty by ID
+      description: Returns specialty by id.
+      x-roles: [USER]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderUser"
+      responses:
+        "200":
+          description: Specialty returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialtyDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Specialty not found }
+
+    put:
+      tags: [Specialties]
+      operationId: updateSpecialtyById
+      summary: Update a specialty by ID
+      description: Update a specialty by ID
+      x-roles: [ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpecialtyUpdateRequest"
+      responses:
+        "200":
+          description: Specialty updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialtyDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Specialty not found }
+        "409": { description: Specialty with such code exists }
+        "422": { description: Request body fails validation }
+
+    delete:
+      tags: [Specialties]
+      operationId: deleteSpecialtyById
+      summary: Delete specialty by ID
+      description: Delete specialty by id.
+      x-roles: [ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+      responses:
+        "204": { description: Specialty deleted successfully }
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Specialty not found }
+
+  /specialties/{id}/educational-programs:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Specialty identifier
+        schema:
+          type: integer
+          format: int64
+
+    post:
+      tags: [Specialties]
+      operationId: addSpecialtyEducationalProgram
+      summary: Add specialty educational program
+      description: Add educational program to specialty
+      x-roles: [ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpecialtyEducationalProgramCreateRequest"
+      responses:
+        "201":
+          description: Specialty educational program added successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialtyDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Specialty not found }
+        "409":
+          { description: Educational program with such name already exists }
+        "422": { description: Request body fails validation }
+
+    get:
+      tags: [Specialties]
+      operationId: getSpecialtyEducationalProgramsById
+      summary: Get specialty educational programs by ID
+      description: Returns specialty educational programs by id.
+      x-roles: [USER]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderUser"
+      responses:
+        "200":
+          description: Specialty educational programs returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EducationalProgramDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Specialty not found }
