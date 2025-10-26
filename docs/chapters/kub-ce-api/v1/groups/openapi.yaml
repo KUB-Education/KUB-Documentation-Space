@@ -161,6 +161,7 @@ paths:
         "400": { description: Bad request }
         "401": { description: Token invalid or roles are missing }
         "422": { description: Request body fails validation }
+
     get:
       tags: [Groups]
       operationId: listGroups
@@ -190,6 +191,7 @@ paths:
         schema:
           type: integer
           format: int64
+
     get:
       tags: [Groups]
       operationId: getGroupById
@@ -208,6 +210,7 @@ paths:
         "400": { description: Bad request }
         "401": { description: Token invalid or roles are missing }
         "404": { description: Group not found }
+
     put:
       tags: [Groups]
       operationId: updateGroupById
@@ -237,6 +240,7 @@ paths:
         "401": { description: Token invalid or roles are missing }
         "404": { description: Group not found }
         "422": { description: Request body fails validation }
+
     delete:
       tags: [Groups]
       operationId: deleteGroupById
@@ -314,6 +318,7 @@ paths:
                 $ref: "#/components/schemas/GroupFullDetailsResponse"
         "400": { description: Bad request }
         "401": { description: Token invalid or roles are missing }
+        "404": { description: Group or student not found }
         "409": { description: Student already exists }
         "422": { description: Request body fails validation }
 
@@ -334,4 +339,4 @@ paths:
                 $ref: "#/components/schemas/GroupFullDetailsResponse"
         "400": { description: Bad request }
         "401": { description: Token invalid or roles are missing }
-        "404": { description: Student not found }
+        "404": { description: Group or student not found }

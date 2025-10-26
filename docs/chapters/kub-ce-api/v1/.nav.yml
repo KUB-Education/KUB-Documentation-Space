@@ -3,7 +3,17 @@ nav:
   - Auth API: ./auth/api.md
   - Account API: ./account/api.md
   - Users API: ./users/api.md
-  - Rooms API: ./rooms/api.md
+
   - Departments API: ./departments/api.md
+
+  - Study Fields API: ./study-fields/api.md
+  - Specialties API: ./specialties/api.md
+  - Educational Programs API: ./educational-programs/api.md
+  # - Subjects API: ./subjects/api.md
+
   - Lecturers API: ./lecturers/api.md
+  # - Students API: ./students/api.md
+
   - Groups API: ./groups/api.md
+
+  - Rooms API: ./rooms/api.md

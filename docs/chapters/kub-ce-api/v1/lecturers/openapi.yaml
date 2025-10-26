@@ -4,7 +4,10 @@ info:
   version: 1.0.0
   description: API for lecturers management for KUB Education.
 servers:
-  - url: https://api.kub.education/api/v1/
+  - url: https://api.kub.education/api/v1
+    description: Production API Server
+  - url: https://stage.api.kub.education/api/v1
+    description: Stage API Server
 
 tags:
   - name: Lecturers
@@ -347,6 +350,7 @@ paths:
                 $ref: "#/components/schemas/LecturerDetailsResponse"
         "400": { description: Bad request }
         "401": { description: Token invalid or roles are missing }
+        "404": { description: Lecturer not found }
         "409": { description: Lecturer department position already exists }
         "422": { description: Request body fails validation }
 
@@ -390,6 +394,7 @@ paths:
                 $ref: "#/components/schemas/LecturerDetailsResponse"
         "400": { description: Bad request }
         "401": { description: Token invalid or roles are missing }
+        "404": { description: Lecturer or department position not found }
         "409": { description: Lecturer department position already exists }
         "422": { description: Request body fails validation }
 
@@ -410,7 +415,7 @@ paths:
                 $ref: "#/components/schemas/LecturerDetailsResponse"
         "400": { description: Bad request }
         "401": { description: Token invalid or roles are missing }
-        "404": { description: Lecturer department position not found }
+        "404": { description: Lecturer or department position not found }
 
   /academic-titles:
     get:
@@ -467,6 +472,7 @@ paths:
                 $ref: "#/components/schemas/LecturerDetailsResponse"
         "400": { description: Bad request }
         "401": { description: Token invalid or roles are missing }
+        "404": { description: Lecturer or academic title not found }
         "409": { description: Lecturer academic title already exists }
         "422": { description: Request body fails validation }
 
@@ -487,4 +493,4 @@ paths:
                 $ref: "#/components/schemas/LecturerDetailsResponse"
         "400": { description: Bad request }
         "401": { description: Token invalid or roles are missing }
-        "404": { description: Lecturer academic title not found }
+        "404": { description: Lecturer or academic title not found }
