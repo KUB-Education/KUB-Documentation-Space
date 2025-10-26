@@ -1,0 +1,274 @@
+openapi: 3.1.0
+info:
+  title: Study Fields API
+  version: 1.0.0
+  description: API for study fields management for KUB Education.
+servers:
+  - url: https://api.kub.education/api/v1
+    description: Production API Server
+  - url: https://stage.api.kub.education/api/v1
+    description: Stage API Server
+
+tags:
+  - name: Study Fields
+
+components:
+  parameters:
+    AuthorizationHeaderUser:
+      name: Authorization
+      in: header
+      required: true
+      description: "Bearer token. Required role: USER"
+      schema:
+        type: string
+        example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+    AuthorizationHeaderAdmin:
+      name: Authorization
+      in: header
+      required: true
+      description: "Bearer token. Required role: ADMIN"
+      schema:
+        type: string
+        example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+  schemas:
+    StudyFieldCreateRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          example: 12
+        name:
+          type: string
+          example: Software Engineering
+      required: [code, name]
+
+    StudyFieldUpdateRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          example: 12
+        name:
+          type: string
+          example: Computer Science
+
+    StudyFieldDetailsResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 42
+        code:
+          type: string
+          example: 12
+        name:
+          type: string
+          example: Software Engineering
+
+    StudyFieldSpecialtyCreateRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          example: 121
+        name:
+          type: string
+          example: System Software
+      required: [code, name]
+
+    SpecialtyDetailsResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 21
+        study_field_id:
+          type: integer
+          format: int64
+          example: 42
+        code:
+          type: string
+          example: 121
+        name:
+          type: string
+          example: System Software
+
+paths:
+  /study-fields:
+    post:
+      tags: [Study Fields]
+      operationId: createStudyField
+      summary: Create a new study field
+      description: Create a new study field
+      x-roles: [ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudyFieldCreateRequest"
+      responses:
+        "201":
+          description: Study field created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudyFieldDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "409": { description: Study field with such code exists }
+        "422": { description: Request body fails validation }
+
+    get:
+      tags: [Study Fields]
+      operationId: listStudyFields
+      summary: List study fields
+      description: Returns array of study fields.
+      x-roles: [USER]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderUser"
+      responses:
+        "200":
+          description: Lecturers returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/StudyFieldDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+
+  /study-fields/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Study field identifier
+        schema:
+          type: integer
+          format: int64
+
+    get:
+      tags: [Study Fields]
+      operationId: getStudyFieldById
+      summary: Get study field by ID
+      description: Returns study field by id.
+      x-roles: [USER]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderUser"
+      responses:
+        "200":
+          description: Study field returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudyFieldDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Study field not found }
+
+    put:
+      tags: [Study Fields]
+      operationId: updateStudyFieldById
+      summary: Update a study field by ID
+      description: Update a study field by ID
+      x-roles: [ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudyFieldUpdateRequest"
+      responses:
+        "200":
+          description: Study field updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudyFieldDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Study field not found }
+        "409": { description: Study field with such code exists }
+        "422": { description: Request body fails validation }
+
+    delete:
+      tags: [Study Fields]
+      operationId: deleteStudyFieldById
+      summary: Delete study field by ID
+      description: Delete study field by id.
+      x-roles: [ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+      responses:
+        "204": { description: Study field deleted successfully }
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Study field not found }
+
+  /study-fields/{id}/specialties:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Study field identifier
+        schema:
+          type: integer
+          format: int64
+
+    post:
+      tags: [Study Fields]
+      operationId: addStudyFieldSpecialty
+      summary: Add study field specialty
+      description: Add specialty to study field
+      x-roles: [ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StudyFieldSpecialtyCreateRequest"
+      responses:
+        "201":
+          description: Study field specialty added successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecialtyDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Study field not found }
+        "409": { description: Specialty with such code already exists }
+        "422": { description: Request body fails validation }
+
+    get:
+      tags: [Study Fields]
+      operationId: getStudyFieldSpecialtiesById
+      summary: Get study field specialties by ID
+      description: Returns study field specialties by id.
+      x-roles: [USER]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderUser"
+      responses:
+        "200":
+          description: Study field specialties returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SpecialtyDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Study field not found }
