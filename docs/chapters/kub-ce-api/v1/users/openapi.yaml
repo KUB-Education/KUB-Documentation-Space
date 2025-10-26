@@ -198,6 +198,7 @@ paths:
         schema:
           type: integer
           format: int64
+
     get:
       tags: [Users]
       operationId: getUserById
@@ -216,6 +217,7 @@ paths:
         "400": { description: Bad request }
         "401": { description: Token invalid or roles are missing }
         "404": { description: User not found }
+
     put:
       tags: [Users]
       operationId: updateUserById
@@ -250,6 +252,7 @@ paths:
         "409": { description: User with such email exists }
         "422": { description: Request body fails validation }
         "503": { description: User updated, but email wasn't sent }
+
     delete:
       tags: [Users]
       operationId: deleteUserById
@@ -260,6 +263,35 @@ paths:
         - $ref: "#/components/parameters/AuthorizationHeaderAdminSet"
       responses:
         "204": { description: User deleted successfully }
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: User not found }
+
+  /users/{id}/resend:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: User identifier
+        schema:
+          type: integer
+          format: int64
+
+    post:
+      tags: [Users]
+      operationId: resendUserPasswordById
+      summary: Resend user password by ID
+      description: Returns user by id.
+      x-roles: [USER]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdminSet"
+      responses:
+        "200":
+          description: User returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDetailsResponse"
         "400": { description: Bad request }
         "401": { description: Token invalid or roles are missing }
         "404": { description: User not found }
