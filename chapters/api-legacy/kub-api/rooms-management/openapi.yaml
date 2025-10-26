@@ -1,0 +1,284 @@
+openapi: 3.1.0
+info:
+  title: KUB Rooms API
+  description: Rooms API for managing rooms on KUB Education platform
+  version: 1.0-dev
+servers:
+  - url: https://stage.api.kub.education
+    description: Stage API Server
+
+paths:
+  /rooms:
+    post:
+      operationId: createRoom
+      summary: Create a new room
+      description: >
+        Creates a new room with the provided details. 
+        Required authority role: admin.
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoomRequest"
+            examples:
+              default:
+                value:
+                  location: "306a"
+                  capacity: 20
+      responses:
+        "201":
+          $ref: "#/components/responses/Created"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+    get:
+      operationId: getRoomsByFilters
+      summary: Get rooms
+      description: >
+        Retrieves a list of all rooms (or by location fragment and min capacity).
+        Required authority role: anyOf(admin, lecturer, student).
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+        - name: location
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 256
+          description: The fragment of the location to filter rooms by.
+        - name: minCapacity
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int16
+            minimum: 1
+            maximum: 32767
+          description: The minimum capacity to filter rooms by.
+      responses:
+        "200":
+          description: Successful retrieval of rooms.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RoomResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /rooms/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+    get:
+      operationId: getRoomById
+      summary: Get room
+      description: > 
+        Retrieves details of a specific room.
+        Required authority role: anyOf(admin, lecturer, student).
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      responses:
+        "200":
+          description: Successful retrieval of the room.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    put:
+      operationId: updateRoom
+      summary: Edit room
+      description: > 
+        Updates details of a specific room. 
+        Required authority role: admin.
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoomUpdateRequest"
+            examples:
+              default:
+                value:
+                  location: "306a"
+                  capacity: 20
+      responses:
+        "200":
+          description: Successful update of the room.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+    delete:
+      operationId: deleteRoom
+      summary: Delete room
+      description: > 
+        Deletes a room.
+        Required authority role: admin.
+      security:
+        - BearerAuth: [ ]
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  responses:
+    Created:
+      description: Resource created successfully
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/RoomResponse"
+    BadRequest:
+      description: Bad request (Wrong request parameters)
+    Unauthorized:
+      description: Unauthorized (Wrong token in Authorization header)
+    Forbidden:
+      description: Forbidden (Insufficient permissions)
+    NotFound:
+      description: Not Found (Resource not found)
+    NoContent:
+      description: No content (Successfully deleted)
+    Conflict:
+      description: Conflict (Resource already exists)
+    UnprocessableEntity:
+      description: Unprocessable Entity (Validation error)
+    ServiceUnavailable:
+      description: Service Unavailable (e.g. SMTP failure)
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "JWT token with required role (admin, lecturer, student)."
+
+  schemas:
+    RoomRequest:
+      type: object
+      required:
+        - location
+        - capacity
+      properties:
+        location:
+          type: string
+          minLength: 1
+          maxLength: 256
+          example: "306a"
+        capacity:
+          type: integer
+          format: int16
+          example: 20
+
+    RoomUpdateRequest:
+      type: object
+      properties:
+        location:
+          type: string
+          minLength: 1
+          maxLength: 256
+          example: "306a"
+        capacity:
+          type: integer
+          format: int16
+          example: 20
+
+    RoomResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        location:
+          type: string
+          minLength: 1
+          maxLength: 256
+          example: "306a"
+        capacity:
+          type: integer
+          format: int16
+          example: 20

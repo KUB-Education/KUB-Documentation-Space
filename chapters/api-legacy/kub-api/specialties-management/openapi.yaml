@@ -1,0 +1,292 @@
+openapi: 3.1.0
+info:
+  title: KUB Specialties API
+  description: Specialties API for managing specialties on KUB Education platform
+  version: 1.1-dev
+servers:
+  - url: https://stage.api.kub.education
+    description: Stage API Server
+
+paths:
+  /specialties:
+    post:
+      operationId: createSpecialty
+      summary: Create a new specialty
+      description: > 
+        Creates a new specialty with the provided details. 
+        Required authority role: admin.
+      security:
+        - Authorization:
+            - admin
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/specialty_request"
+            examples:
+              default:
+                value:
+                  code: "CS101"
+                  name: "computer_science"
+                  study_field_id: 1
+      responses:
+        "201":
+          $ref: "#/components/responses/Created"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+    
+    get:
+      operationId: getSpecialtiesByFilters
+      summary: Get specialties
+      description: > 
+        Retrieves a list of all specialties (or by code/name filter).
+        Required authority role: anyOf(admin, lecturer, student).
+      security:
+        - Authorization:
+            - admin
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 128
+          description: The fragment of the name to filter specialties by.
+        - name: code
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 32
+          description: The fragment of the code to filter specialties by.
+      responses:
+        "200":
+          description: Successful retrieval of specialties.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/specialty_response"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+  /specialties/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+
+    get:
+      operationId: getSpecialtyById
+      summary: Get specialty
+      description: > 
+        Retrieves details of a specific specialty.
+        Required authority role: anyOf(admin, lecturer, student).
+      security:
+        - Authorization:
+            - admin
+            - lecturer
+            - student
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      responses:
+        "200":
+          description: Successful retrieval of the specialty.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/specialty_response"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    put:
+      operationId: updateSpecialty
+      summary: Edit specialty
+      description: > 
+        Updates details of a specific specialty. 
+        Required authority role: admin.
+      security:
+        - Authorization:
+            - admin
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/specialty_update_request"
+            examples:
+              default:
+                value:
+                  code: "CS101"
+                  name: "computer_science"
+                  study_field_id: 2
+      responses:
+        "200":
+          description: Successful update of the specialty.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/specialty_response"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+    delete:
+      operationId: deleteSpecialty
+      summary: Delete specialty
+      description: > 
+        Deletes a specialty. 
+        Required authority role: admin.
+      security:
+        - Authorization:
+            - admin
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+            example: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          description: Bearer token.
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  responses:
+    Created:
+      description: Resource created successfully
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/specialty_response"
+    BadRequest:
+      description: Bad request (Wrong request parameters)
+    Unauthorized:
+      description: Unauthorized (Wrong token in Authorization header)
+    Forbidden:
+      description: Forbidden (Insufficient permissions)
+    NotFound:
+      description: Not Found (Resource not found)
+    NoContent:
+      description: No content (Successfully deleted)
+    Conflict:
+      description: Conflict (Resource already exists)
+    UnprocessableEntity:
+      description: Unprocessable Entity (Validation error)
+
+  securitySchemes:
+    Authorization:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "JWT token with required role (admin, lecturer, student)."
+
+  schemas:
+    specialty_request:
+      type: object
+      required:
+        - code
+        - name
+        - study_field_id
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 32
+        name:
+          type: string
+          minLength: 1
+          maxLength: 128
+        study_field_id:
+          type: integer
+          format: int64
+    
+    specialty_update_request:
+      type: object
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 32
+        name:
+          type: string
+          minLength: 1
+          maxLength: 128
+        study_field_id:
+          type: integer
+          format: int64
+
+    specialty_response:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        code:
+          type: string
+        name:
+          type: string
+        study_field_name:
+          type: string

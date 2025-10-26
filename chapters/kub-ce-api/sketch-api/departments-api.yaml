@@ -1,0 +1,158 @@
+openapi: 3.1.0
+info:
+  title: Departments API
+  version: 1.0.0
+  description: API for departments management for KUB Education.
+servers:
+  - url: https://api.kub.education/api/v1/
+
+$objects:
+  DepartmentCreateRequest:
+    name: string
+
+  DepartmenUpdateRequest:
+    name: string
+
+  DepartmentDetailsResponse:
+    id: integer
+    name: string
+
+post /departments:
+  Description: Create a new department
+  Authorization:
+    - Definition: Bearer token
+    - Description: Requires any of roles ADMIN
+
+  Request:
+    body:
+      $objects@DepartmentCreateRequest:
+
+  Response:
+    - variant:
+      Description: Department created succcessfully
+      code: 201
+      body:
+        $objects@DepartmentDetailsResponse:
+
+    - variant:
+      Description: Bad request
+      code: 400
+
+    - variant:
+      Description: Token invalid or roles are missing
+      code: 401
+
+    - variant:
+      Description: Department with such name exists
+      code: 409
+
+    - variant:
+      Decription: Request body fails validation
+      code: 422
+
+get /departments:
+  Description: Return a departments list
+  Authorization:
+    - Definition: Bearer token
+    - Description: Requires any of roles ADMIN
+
+  Response:
+    - variant:
+      Description: Departments list returned succcessfully
+      code: 200
+      body:
+        array:
+          $objects@DepartmentDetailsResponse:
+
+    - variant:
+      Description: Bad request
+      code: 400
+
+    - variant:
+      Description: Token invalid or roles are missing
+      code: 401
+
+get /departments/{id}:
+  Description: Return a department by ID
+  Authorization:
+    - Definition: Bearer token
+    - Description: Requires any of roles USER
+
+  Response:
+    - variant:
+      Description: Department returned succcessfully
+      code: 200
+      body:
+        $objects@DepartmentDetailsResponse:
+
+    - variant:
+      Description: Bad request
+      code: 400
+
+    - variant:
+      Description: Token invalid or roles are missing
+      code: 401
+
+    - veriant:
+      Description: Department not found
+      code: 404
+
+put /departments/{id}:
+  Description: Update a department by ID
+  Authorization:
+    - Definition: Bearer token
+    - Description: Requires any of roles ADMIN
+
+  Request:
+    body:
+      $objects@DepartmentUpdateRequest:
+
+  Response:
+    - variant:
+      Description: Department updated succcessfully
+      code: 200
+      body:
+        $objects@DepartmentDetailsResponse:
+
+    - variant:
+      Description: Bad request
+      code: 400
+
+    - variant:
+      Description: Token invalid or roles are missing
+      code: 401
+
+    - veriant:
+      Description: Department not found
+      code: 404
+
+    - variant:
+      Description: Department with such name exists
+      code: 409
+
+    - variant:
+      Decription: Request body fails validation
+      code: 422
+
+delete /departments/{id}:
+  Description: Delete a department by ID
+  Authorization:
+    - Definition: Bearer token
+    - Description: Requires any of roles ADMIN
+
+  Response:
+    - variant:
+      Description: Department deleted successful
+      code: 204
+
+    - variant:
+      Description: Bad request
+      code: 400
+
+    - variant:
+      Description: Token invalid or roles are missing
+      code: 401
+
+    - veriant:
+      Description: Department not found
+      code: 404

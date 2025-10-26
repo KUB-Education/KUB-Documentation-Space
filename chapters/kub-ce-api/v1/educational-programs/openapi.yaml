@@ -1,0 +1,239 @@
+openapi: 3.1.0
+info:
+  title: Educational Programs API
+  version: 1.0.0
+  description: API for educational programs management for KUB Education.
+servers:
+  - url: https://api.kub.education/api/v1
+    description: Production API Server
+  - url: https://stage.api.kub.education/api/v1
+    description: Stage API Server
+
+tags:
+  - name: Educational Programs
+
+components:
+  parameters:
+    AuthorizationHeaderUser:
+      name: Authorization
+      in: header
+      required: true
+      description: "Bearer token. Required role: USER"
+      schema:
+        type: string
+        example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+    AuthorizationHeaderAdmin:
+      name: Authorization
+      in: header
+      required: true
+      description: "Bearer token. Required role: ADMIN"
+      schema:
+        type: string
+        example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+  schemas:
+    EducationalProgramDetailsResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 7
+        specialty_id:
+          type: integer
+          format: int64
+          example: 21
+        name:
+          type: string
+          example: Systems Software 2016
+        degree_type:
+          type: string
+          enum: [BACHELOR, MASTER, POSTGRADUATE]
+          example: MASTER
+        study_form:
+          type: string
+          enum: [FULL_TIME, PART_TIME, ONLINE]
+          example: FULL_TIME
+        duration:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 32767
+          example: 21
+
+    EducationalProgramUpdateRequest:
+      type: object
+      properties:
+        specialty_id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: Systems Software 2016
+        degree_type:
+          type: string
+          enum: [BACHELOR, MASTER, POSTGRADUATE]
+          example: MASTER
+        study_form:
+          type: string
+          enum: [FULL_TIME, PART_TIME, ONLINE]
+          example: FULL_TIME
+        duration:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 32767
+          example: 21
+
+paths:
+  /educational-programs:
+    get:
+      tags: [Educational Programs]
+      operationId: listEducationalPrograms
+      summary: List educational programs
+      description: Returns array of educational programs.
+      x-roles: [USER]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderUser"
+      responses:
+        "200":
+          description: Educational Programs returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EducationalProgramDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+
+  /educational-programs/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Educational program identifier
+        schema:
+          type: integer
+          format: int64
+
+    get:
+      tags: [Educational Programs]
+      operationId: getEducationalProgram
+      summary: Get educational program by ID
+      description: Returns educational program by id.
+      x-roles: [USER]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderUser"
+      responses:
+        "200":
+          description: Educational program returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EducationalProgramDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Educational program not found }
+
+    put:
+      tags: [Educational Programs]
+      operationId: updateEducatinalProgramById
+      summary: Update a educational program by ID
+      description: Update a educational program by ID
+      x-roles: [ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EducationalProgramUpdateRequest"
+      responses:
+        "200":
+          description: Educational program updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EducationalProgramDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Educational program not found }
+        "409": { description: Educational program with such name exists }
+        "422": { description: Request body fails validation }
+
+    delete:
+      tags: [Educational Programs]
+      operationId: deleteEducationalProgramById
+      summary: Delete educational program by ID
+      description: Delete educational program by id.
+      x-roles: [ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+      responses:
+        "204": { description: Educational program deleted successfully }
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Educational program not found }
+
+  # /educational-programs/{id}/terms:
+  #   parameters:
+  #     - name: id
+  #       in: path
+  #       required: true
+  #       description: Educational program identifier
+  #       schema:
+  #         type: integer
+  #         format: int64
+
+  #   post:
+  #     tags: [Educational Programs]
+  #     operationId: addSpecialtyEducationalProgram
+  #     summary: Add specialty educational program
+  #     description: Add educational program to specialty
+  #     x-roles: [ADMIN]
+  #     parameters:
+  #       - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             $ref: "#/components/schemas/SpecialtyEducationalProgramCreateRequest"
+  #     responses:
+  #       "201":
+  #         description: Specialty educational program added successfully
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/SpecialtyDetailsResponse"
+  #       "400": { description: Bad request }
+  #       "401": { description: Token invalid or roles are missing }
+  #       "404": { description: Specialty not found }
+  #       "409":
+  #         { description: Educational program with such name already exists }
+  #       "422": { description: Request body fails validation }
+
+  #   get:
+  #     tags: [Educational Programs]
+  #     operationId: getSpecialtyEducationalProgramsById
+  #     summary: Get specialty educational programs by ID
+  #     description: Returns specialty educational programs by id.
+  #     x-roles: [USER]
+  #     parameters:
+  #       - $ref: "#/components/parameters/AuthorizationHeaderUser"
+  #     responses:
+  #       "200":
+  #         description: Specialty educational programs returned successfully
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: array
+  #               items:
+  #                 $ref: "#/components/schemas/EducationalProgramDetailsResponse"
+  #       "400": { description: Bad request }
+  #       "401": { description: Token invalid or roles are missing }
+  #       "404": { description: Specialty not found }

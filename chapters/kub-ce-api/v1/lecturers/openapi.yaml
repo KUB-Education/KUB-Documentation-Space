@@ -1,0 +1,496 @@
+openapi: 3.1.0
+info:
+  title: Lecturers API
+  version: 1.0.0
+  description: API for lecturers management for KUB Education.
+servers:
+  - url: https://api.kub.education/api/v1
+    description: Production API Server
+  - url: https://stage.api.kub.education/api/v1
+    description: Stage API Server
+
+tags:
+  - name: Lecturers
+
+components:
+  parameters:
+    AuthorizationHeaderUser:
+      name: Authorization
+      in: header
+      required: true
+      description: "Bearer token. Required role: USER"
+      schema:
+        type: string
+        example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+    AuthorizationHeaderAdmin:
+      name: Authorization
+      in: header
+      required: true
+      description: "Bearer token. Required role: ADMIN"
+      schema:
+        type: string
+        example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+  schemas:
+    LecturerCreateRequest:
+      type: object
+      properties:
+        last_name:
+          type: string
+        first_name:
+          type: string
+        middle_name:
+          type: string
+        email:
+          type: string
+
+    LecturerDetailsResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        user:
+          $ref: "#/components/schemas/UserDetailsResponse"
+        department_positions:
+          type: array
+          items:
+            $ref: "#/components/schemas/DepartmentPositionDto"
+        academic_titles:
+          type: array
+          items:
+            $ref: "#/components/schemas/AcademicTitleDto"
+
+    UserDetailsResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        last_name:
+          type: string
+        first_name:
+          type: string
+        middle_name:
+          type: string
+        email:
+          type: string
+        status:
+          type: string
+          enum:
+            [
+              EMAIL_SENDING_FAILURE,
+              ACTIVATION_PENDING,
+              ACTIVATION_EXPIRED,
+              ACTIVATED,
+              RECOVERY_PENDING,
+            ]
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/RoleDto"
+
+    RoleDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [USER, STUDENT, LECTURER, ADMIN, SYSADMIN, ORGANIZER]
+
+    DepartmentPositionDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        department:
+          $ref: "#/components/schemas/DepartmentDetailsResponse"
+        position:
+          $ref: "#/components/schemas/PositionDto"
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE, TERMINATED]
+
+    DepartmentDetailsResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    PositionDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          enum: [ASSISTANT, ASSOSIATE_PROFESSOR, PROFESSOR]
+
+    AcademicTitleDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          enum: [CANDIDATE_OF_X, DOCTOR_OF_X, PHD_OF_X]
+
+    LecturerAddDepartmentPositionRequest:
+      type: object
+      properties:
+        department_id:
+          type: integer
+        position_id:
+          type: integer
+
+    LecturerDepartmentPositionUpdateRequest:
+      type: object
+      properties:
+        position_id:
+          type: integer
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE, TERMINATED]
+
+#getUserLevel(user-id) -> UserEntity <>
+#POST /lecturers DONE
+#GET /lecturers DONE
+#GET /lecturers/{id} DONE
+#GET /lecturers/user/{id} DONE
+
+#PUT::
+#POST /lecturers/{id}/department-positions DONE
+#PUT /lecturers/{id}/department-positions/{id} DONE
+#DELETE /lecturers/{id}/department-positions/{id} DONE
+
+#PUT /lecturers/{id}/academic-titles/{id}
+#DELETE /lecturers/{id}/academic-titles/{id}
+
+#DELETE /lecturers/{id} DONE
+
+paths:
+  /lecturers:
+    post:
+      tags: [Lecturers]
+      operationId: createLecturerUser
+      summary: Create a new lecturer user
+      description: Create a new lecturer user
+      x-roles: [ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LecturerCreateRequest"
+            example:
+              last_name: "John"
+              first_name: "Dohe"
+              middle_name: ""
+              email: "user@example.com"
+      responses:
+        "201":
+          description: Lecturer created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LecturerDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "409": { description: User with such email exists }
+        "422": { description: Request body fails validation }
+
+    get:
+      tags: [Lecturers]
+      operationId: listLecturers
+      summary: List lecturers
+      description: Returns array of lecturers.
+      x-roles: [USER]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderUser"
+      responses:
+        "200":
+          description: Lecturers returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LecturerDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+
+  /lecturers/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Lecturer identifier
+        schema:
+          type: integer
+          format: int64
+
+    get:
+      tags: [Lecturers]
+      operationId: getLecturerById
+      summary: Get lecturer by ID
+      description: Returns lecturer by id.
+      x-roles: [USER]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderUser"
+      responses:
+        "200":
+          description: Lecturer returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LecturerDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Lecturer not found }
+
+    delete:
+      tags: [Lecturers]
+      operationId: deleteLecturerById
+      summary: Delete lecturer by ID
+      description: Delete lecturer by id.
+      x-roles: [ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+      responses:
+        "204": { description: Lecturer deleted successfully }
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Lecturer not found }
+
+  /lecturers/user/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: User identifier
+        schema:
+          type: integer
+          format: int64
+
+    get:
+      tags: [Lecturers]
+      operationId: getLecturerByUserId
+      summary: Get lecturer by user ID
+      description: Returns lecturer by user id.
+      x-roles: [USER]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderUser"
+      responses:
+        "200":
+          description: Lecturer returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LecturerDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Lecturer not found }
+
+  /positions:
+    get:
+      tags: [Lecturers]
+      operationId: listPositions
+      summary: List positions
+      description: Returns array of positions.
+      x-roles: [ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+      responses:
+        "200":
+          description: Positions returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PositionDto"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+
+  /lecturers/{id}/department-positions:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: Lecturer identifier
+        schema:
+          type: integer
+          format: int64
+
+    post:
+      tags: [Lecturers]
+      operationId: addLecturerDepartmentPosition
+      summary: Add lecturer department position
+      description: Add department position to lecturer
+      x-roles: [ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LecturerAddDepartmentPositionRequest"
+      responses:
+        "201":
+          description: Lecturer department position added successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LecturerDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Lecturer not found }
+        "409": { description: Lecturer department position already exists }
+        "422": { description: Request body fails validation }
+
+  /lecturers/{lecturer-id}/department-positions/{department-position-id}:
+    parameters:
+      - name: lecturer-id
+        in: path
+        required: true
+        description: Lecturer identifier
+        schema:
+          type: integer
+          format: int64
+      - name: department-position-id
+        in: path
+        required: true
+        description: Lecturer department position identifier
+        schema:
+          type: integer
+          format: int64
+
+    put:
+      tags: [Lecturers]
+      operationId: updateLecturerDepartmentPosition
+      summary: Update lecturer department position
+      description: Update department position to lecturer
+      x-roles: [ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LecturerDepartmentPositionUpdateRequest"
+      responses:
+        "200":
+          description: Lecturer department position updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LecturerDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Lecturer or department position not found }
+        "409": { description: Lecturer department position already exists }
+        "422": { description: Request body fails validation }
+
+    delete:
+      tags: [Lecturers]
+      operationId: deleteLecturerDepartmentPositionById
+      summary: Delete lecturer department position by ID
+      description: Delete lecturer department position by identifier.
+      x-roles: [ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+      responses:
+        "200":
+          description: Lecturer department position deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LecturerDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Lecturer or department position not found }
+
+  /academic-titles:
+    get:
+      tags: [Lecturers]
+      operationId: listAcademicTitles
+      summary: List academic titles
+      description: Returns array of academic titles.
+      x-roles: [ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+      responses:
+        "200":
+          description: Academic titles returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AcademicTitleDto"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+
+  /lecturers/{lecturer-id}/academic-titles/{academic-title-id}:
+    parameters:
+      - name: lecturer-id
+        in: path
+        required: true
+        description: Lecturer identifier
+        schema:
+          type: integer
+          format: int64
+      - name: academic-title-id
+        in: path
+        required: true
+        description: Academic title identifier
+        schema:
+          type: integer
+          format: int64
+
+    put:
+      tags: [Lecturers]
+      operationId: addLecturerAcademicTitle
+      summary: Add lecturer academic title
+      description: Add academic title to lecturer
+      x-roles: [ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+      responses:
+        "200":
+          description: Academic title added to lecturer successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LecturerDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Lecturer or academic title not found }
+        "409": { description: Lecturer academic title already exists }
+        "422": { description: Request body fails validation }
+
+    delete:
+      tags: [Lecturers]
+      operationId: deleteLecturerAcademicTitle
+      summary: Delete lecturer academic title
+      description: Delete academic title from lecturer.
+      x-roles: [ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdmin"
+      responses:
+        "200":
+          description: Lecturer academic title deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LecturerDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: Lecturer or academic title not found }

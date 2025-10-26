@@ -1,0 +1,373 @@
+openapi: 3.1.0
+info:
+  title: Users API
+  version: 1.0.0
+  description: API for users management for KUB Education.
+servers:
+  - url: https://api.kub.education/api/v1
+    description: Production API Server
+  - url: https://stage.api.kub.education/api/v1
+    description: Stage API Server
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Users
+    description: User management operations
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    AuthorizationHeaderUser:
+      name: Authorization
+      in: header
+      required: true
+      description: "Bearer token. Required role: USER"
+      schema:
+        type: string
+        example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+    AuthorizationHeaderAdminSet:
+      name: Authorization
+      in: header
+      required: true
+      description: "Bearer token. Required roles: ORGANIZER, SYSADMIN, ADMIN"
+      schema:
+        type: string
+        example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+  schemas:
+    RoleType:
+      type: object
+      additionalProperties: false
+      description: 'Wrapper for a role assignment, e.g. { "type": "ADMIN" }'
+      properties:
+        type:
+          type: string
+          enum: [USER, STUDENT, LECTURER, ADMIN, SYSADMIN, ORGANIZER]
+      required: [type]
+
+    Role:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+          format: int64
+        type:
+          type: string
+          enum: [USER, STUDENT, LECTURER, ADMIN, SYSADMIN, ORGANIZER]
+      required: [id, type]
+
+    UserCreateRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        last_name:
+          type: string
+        first_name:
+          type: string
+        middle_name:
+          type: string
+        email:
+          type: string
+          format: email
+      required: [last_name, first_name, email]
+
+    UserUpdateRequest:
+      type: object
+      additionalProperties: false
+      description: All fields are optional; include the ones to change.
+      properties:
+        last_name:
+          type: string
+        first_name:
+          type: string
+        middle_name:
+          type: string
+        email:
+          type: string
+          format: email
+
+    UserStatus:
+      type: string
+      enum:
+        - EMAIL_SENDING_FAILURE
+        - ACTIVATION_PENDING
+        - ACTIVATION_EXPIRED
+        - ACTIVATED
+        - RECOVERY_PENDING
+
+    UserDetailsResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: integer
+          format: int64
+        last_name:
+          type: string
+        first_name:
+          type: string
+        middle_name:
+          type: string
+        email:
+          type: string
+          format: email
+        status:
+          $ref: "#/components/schemas/UserStatus"
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/Role"
+      required:
+        - id
+        - last_name
+        - first_name
+        - email
+        - status
+        - roles
+
+paths:
+  /users:
+    post:
+      tags: [Users]
+      operationId: createUser
+      summary: Create user (default role USER)
+      description: Creates user record with default role USER.
+      x-roles: [ORGANIZER, SYSADMIN, ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdminSet"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreateRequest"
+            examples:
+              allFields:
+                value:
+                  first_name: "Ada"
+                  last_name: "Lovelace"
+                  middle_name: "Byron"
+                  email: "ada.lovelace@kub.education"
+      responses:
+        "201":
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "409": { description: User with such email exists }
+        "422": { description: Request body fails validation }
+
+    get:
+      tags: [Users]
+      operationId: listUsers
+      summary: List users
+      description: Returns array of users.
+      x-roles: [ORGANIZER, SYSADMIN, ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdminSet"
+      responses:
+        "200":
+          description: Users returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+
+  /users/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: User identifier
+        schema:
+          type: integer
+          format: int64
+
+    get:
+      tags: [Users]
+      operationId: getUserById
+      summary: Get user by ID
+      description: Returns user by id.
+      x-roles: [USER]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderUser"
+      responses:
+        "200":
+          description: User returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: User not found }
+
+    put:
+      tags: [Users]
+      operationId: updateUserById
+      summary: Update user by ID
+      description: Update user by id.
+      x-roles: [ORGANIZER, SYSADMIN, ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdminSet"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdateRequest"
+            examples:
+              allUpdatableFields:
+                value:
+                  first_name: "Ada"
+                  last_name: "Lovelace"
+                  middle_name: "Byron"
+                  email: "ada.research@kub.education"
+      responses:
+        "200":
+          description: User returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: User not found }
+        "409": { description: User with such email exists }
+        "422": { description: Request body fails validation }
+        "503": { description: User updated, but email wasn't sent }
+
+    delete:
+      tags: [Users]
+      operationId: deleteUserById
+      summary: Delete user by ID
+      description: Delete user by id.
+      x-roles: [ORGANIZER, SYSADMIN, ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdminSet"
+      responses:
+        "204": { description: User deleted successfully }
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: User not found }
+
+  /users/{id}/resend:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: User identifier
+        schema:
+          type: integer
+          format: int64
+
+    post:
+      tags: [Users]
+      operationId: resendUserPasswordById
+      summary: Resend user password by ID
+      description: Returns user by id.
+      x-roles: [USER]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdminSet"
+      responses:
+        "200":
+          description: User returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: User not found }
+
+  /roles:
+    get:
+      tags: [Users]
+      operationId: listRoles
+      summary: List roles
+      description: Returns array of roles.
+      x-roles: [ORGANIZER, SYSADMIN, ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdminSet"
+      responses:
+        "200":
+          description: Roles returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Role"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+
+  /users/{user-id}/roles/{role-id}:
+    parameters:
+      - name: user-id
+        in: path
+        required: true
+        description: User identifier
+        schema:
+          type: integer
+          format: int64
+      - name: role-id
+        in: path
+        required: true
+        description: Role identifier
+        schema:
+          type: integer
+          format: int64
+    put:
+      tags: [Users]
+      operationId: addRoleToUser
+      summary: Add user role
+      description: Add user role.
+      x-roles: [ORGANIZER, SYSADMIN, ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdminSet"
+      responses:
+        "200":
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: User or role not found }
+        "409": { description: Role already exists }
+
+    delete:
+      tags: [Users]
+      operationId: removeRoleFromUser
+      summary: Remove user role
+      description: Remove user role.
+      x-roles: [ORGANIZER, SYSADMIN, ADMIN]
+      parameters:
+        - $ref: "#/components/parameters/AuthorizationHeaderAdminSet"
+      responses:
+        "200":
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDetailsResponse"
+        "400": { description: Bad request }
+        "401": { description: Token invalid or roles are missing }
+        "404": { description: User or role not found }
